@@ -40,8 +40,11 @@ def action_wrapper(hermes, intentMessage, conf):
      
     Refer to the documentation for further details. 
     """ 
-    
-    hermes.publish_end_session(intentMessage.session_id, "Keine Ergebnisse")
+    kia = KolfsInselAutomation()
+    txt = kia.SwitchLights(hermes, intentMessage, conf)
+    if txt == None:
+        txt = 'Wie bitte?'
+    hermes.publish_end_session(intentMessage.session_id, txt)
     
 
 
