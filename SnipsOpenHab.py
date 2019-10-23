@@ -35,10 +35,13 @@ def read_configuration_file(configuration_file):
     Refer to the documentation for further details. 
     """ 
 
-def subscribe_intent_callback(hermes, intentMessage):
-    #conf = read_configuration_file(CONFIG_INI)
+def switch_lights_callback(hermes, intentMessage):
+    conf = read_configuration_file(CONFIG_INI)
     kia = KolfsInselAutomation.KolfsInselAutomation()
-    txt = kia.SwitchLights(hermes, intentMessage, conf)
+    
+    required_slot_question = None
+    txt = kia.SwitchLights(hermes, intentMessage, conf, required_slot_question)
     if txt == None:
-        txt = 'Wie bitte?'
-    hermes.publish_end_session(intentMessage.session_id, txt)
+        KolfsInselAutomation.ContinueSession (hermes, intentMessage, required_slot_question)
+    else:
+        hermes.publish_end_session(intentMessage.session_id, txt)
