@@ -39,7 +39,7 @@ def switch_lights_callback(hermes, intentMessage):
     conf = read_configuration_file(CONFIG_INI)
     kia = KolfsInselAutomation.KolfsInselAutomation()
     
-    required_slot_question = None
+    required_slot_question = {}
     txt = kia.SwitchLights(hermes, intentMessage, conf, required_slot_question)
     if txt == None:
         KolfsInselAutomation.ContinueSession (hermes, intentMessage, required_slot_question)
