@@ -1,0 +1,3 @@
+# Bindings for the hermes protocol 
+hermes-python>=0.2
+python-openhab>=2.10.2
