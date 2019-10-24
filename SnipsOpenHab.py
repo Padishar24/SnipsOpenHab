@@ -45,3 +45,14 @@ def switch_lights_callback(hermes, intentMessage):
         KolfsInselAutomation.ContinueSession (hermes, intentMessage, required_slot_question)
     else:
         hermes.publish_end_session(intentMessage.session_id, txt)
+        
+def reportOpenWindows(hermes, intentMessage):
+    conf = read_configuration_file(CONFIG_INI)
+    kia = KolfsInselAutomation.KolfsInselAutomation()
+    
+    required_slot_question = {}
+    txt = kia.GetOpenWindows(hermes, intentMessage, conf, required_slot_question)
+    if txt == None:
+        KolfsInselAutomation.ContinueSession (hermes, intentMessage, required_slot_question)
+    else:
+        hermes.publish_end_session(intentMessage.session_id, txt)
