@@ -8,5 +8,5 @@ import SnipsOpenHab
 if __name__ == "__main__":
     mqtt_opts = MqttOptions()
     with Hermes(mqtt_options=mqtt_opts) as h:
-        h.subscribe_intent("burkhardzeiner:openWindows", SnipsOpenHab.leaveHouse) \
+        h.subscribe_intent("burkhardzeiner:goodBye", SnipsOpenHab.leaveHouse) \
          .start()
