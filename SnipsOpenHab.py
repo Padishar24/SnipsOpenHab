@@ -35,35 +35,40 @@ def read_configuration_file(configuration_file):
     Refer to the documentation for further details. 
     """ 
 
+def action(action, hermes, intentMessage):
+    conf = read_configuration_file(CONFIG_INI)
+    kia = KolfsInselAutomation.KolfsInselAutomation()
+    
+    required_slot_question = {}
+    txt = ""
+    if action == "SwitchLights":
+        kia.SwitchLights(hermes, intentMessage, conf, required_slot_question)
+    elif action == "GetOpenWindows":
+        txt = kia.GetOpenWindows(hermes, intentMessage, conf, required_slot_question)
+    elif action == "LeaveHouse":
+        txt = kia.LeaveHouse(hermes, intentMessage, conf, required_slot_question)
+    elif action == "GoodNight":
+        txt = kia.GoodNight(hermes, intentMessage, conf, required_slot_question)
+    elif action == "GoodMorning":
+        txt = kia.GoodMorning(hermes, intentMessage, conf, required_slot_question)
+    
+    if txt == None:
+        KolfsInselAutomation.ContinueSession (hermes, intentMessage, required_slot_question)
+    else:
+        hermes.publish_end_session(intentMessage.session_id, txt)
+    
 def switch_lights_callback(hermes, intentMessage):
-    conf = read_configuration_file(CONFIG_INI)
-    kia = KolfsInselAutomation.KolfsInselAutomation()
-    
-    required_slot_question = {}
-    txt = kia.SwitchLights(hermes, intentMessage, conf, required_slot_question)
-    if txt == None:
-        KolfsInselAutomation.ContinueSession (hermes, intentMessage, required_slot_question)
-    else:
-        hermes.publish_end_session(intentMessage.session_id, txt)
-        
+    action ("SwitchLights", hermes, intentMessage)
+
 def reportOpenWindows(hermes, intentMessage):
-    conf = read_configuration_file(CONFIG_INI)
-    kia = KolfsInselAutomation.KolfsInselAutomation()
+    action ("GetOpenWindows", hermes, intentMessage)
     
-    required_slot_question = {}
-    txt = kia.GetOpenWindows(hermes, intentMessage, conf, required_slot_question)
-    if txt == None:
-        KolfsInselAutomation.ContinueSession (hermes, intentMessage, required_slot_question)
-    else:
-        hermes.publish_end_session(intentMessage.session_id, txt)
-        
 def leaveHouse(hermes, intentMessage):
-    conf = read_configuration_file(CONFIG_INI)
-    kia = KolfsInselAutomation.KolfsInselAutomation()
+    action ("LeaveHouse", hermes, intentMessage)
     
-    required_slot_question = {}
-    txt = kia.LeaveHouse(hermes, intentMessage, conf, required_slot_question)
-    if txt == None:
-        KolfsInselAutomation.ContinueSession (hermes, intentMessage, required_slot_question)
-    else:
-        hermes.publish_end_session(intentMessage.session_id, txt) 
+def goodNight(hermes, intentMessage):
+    action ("GoodNight", hermes, intentMessage)
+    
+def goodMorning(hermes, intentMessage):
+    action ("GoodMorning", hermes, intentMessage)
+    
