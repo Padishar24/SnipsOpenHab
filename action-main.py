@@ -44,8 +44,15 @@ def on_message_intent(client, userdata, msg):
     shortIntent = intent_id.split(":")[1]
     print ("Short Intent: " + shortIntent)
     handledIntent = True
-    if shortIntent in ["LampenAnSchalten", "LampenAusSchalten", "LichtDimmen"]:
-        txt = kia.SwitchLights(intent_id, site_id, slots, required_slot_question)
+    if shortIntent in ["LampenAnSchalten", "LampenAusSchalten", "LichtDimmen", "lightDimPercentage"]:
+        if shortIntent == "lightDimPercentage":
+            custom_data = json.loads(data['customData'])
+            if custom_data and 'past_intent' in custom_data.keys():
+                slots.update (custom_data['slots'])
+                print ("Updated slots: " + json.dumps(slots))
+                txt = kia.SwitchLights(custom_data['past_intent'], site_id, slots, required_slot_question)
+        else:
+            txt = kia.SwitchLights(intent_id, site_id, slots, required_slot_question)
     elif shortIntent == "openWindows":
         txt = kia.GetOpenWindows(site_id, slots, required_slot_question)
     elif shortIntent == "goodBye":
