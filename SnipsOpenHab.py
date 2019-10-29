@@ -42,7 +42,7 @@ def action(action, hermes, intentMessage):
     required_slot_question = {}
     txt = ""
     if action == "SwitchLights":
-        kia.SwitchLights(hermes, intentMessage, conf, required_slot_question)
+        txt = kia.SwitchLights(hermes, intentMessage, conf, required_slot_question)
     elif action == "GetOpenWindows":
         txt = kia.GetOpenWindows(hermes, intentMessage, conf, required_slot_question)
     elif action == "LeaveHouse":
@@ -54,7 +54,7 @@ def action(action, hermes, intentMessage):
     
     if txt == None:
         KolfsInselAutomation.ContinueSession (hermes, intentMessage, required_slot_question)
-    else:
+    else:   
         hermes.publish_end_session(intentMessage.session_id, txt)
     
 def switch_lights_callback(hermes, intentMessage):
