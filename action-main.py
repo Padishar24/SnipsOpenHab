@@ -30,6 +30,7 @@ def get_slots(data):
 
 def on_message_intent(client, userdata, msg):
     data = json.loads(msg.payload.decode("utf-8"))
+    print (json.dumps(data))
     session_id = data['sessionId']
     intent_id = data['intent']['intentName']
     slots = get_slots (data)
