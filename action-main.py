@@ -42,7 +42,7 @@ def on_message_intent(client, userdata, msg):
     required_slot_question = {}
     txt = "Ich verstehe dich nicht."
     if intent_id == add_prefix("SwitchLights"):
-        txt =   kia.SwitchLights(site_id, slots, required_slot_question)
+        txt =   kia.SwitchLights(intent_id, site_id, slots, required_slot_question)
     elif intent_id == add_prefix("GetOpenWindows"):
         txt = kia.GetOpenWindows(site_id, slots, required_slot_question)
     elif intent_id == add_prefix("LeaveHouse"):
