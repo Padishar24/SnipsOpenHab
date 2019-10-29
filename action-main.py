@@ -3,7 +3,6 @@
 
 import paho.mqtt.client as mqtt
 import json
-import SnipsOpenHab
 import toml
 import KolfsInselAutomation
 
