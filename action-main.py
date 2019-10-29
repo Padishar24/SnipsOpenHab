@@ -20,8 +20,10 @@ def get_slots(data):
         for slot in data['slots']:
             if slot['value']['kind'] in ["InstantTime", "TimeInterval", "Duration"]:
                 slot_dict[slot['slotName']] = slot['value']
-            elif slot['value']['kind'] == "Custom":
+            else:
                 slot_dict[slot['slotName']] = slot['value']['value']
+            # elif slot['value']['kind'] == "Custom":
+                # slot_dict[slot['slotName']] = slot['value']['value']
     except (KeyError, TypeError, ValueError) as e:
         print("Error: ", e)
         slot_dict = {}
@@ -33,21 +35,22 @@ def on_message_intent(client, userdata, msg):
     print (json.dumps(data))
     session_id = data['sessionId']
     intent_id = data['intent']['intentName']
+    site_id = data['siteId']
     slots = get_slots (data)
     print (json.dumps(slots))
 
     required_slot_question = {}
     txt = "Ich verstehe dich nicht."
-    # if intent_id == add_prefix("SwitchLights"):
-    #     txt =   kia.SwitchLights(hermes, intentMessage, conf, required_slot_question)
-    # elif intent_id == add_prefix("GetOpenWindows"):
-    #     txt = kia.GetOpenWindows(hermes, intentMessage, conf, required_slot_question)
-    # elif intent_id == add_prefix("LeaveHouse"):
-    #     txt = kia.LeaveHouse(hermes, intentMessage, conf, required_slot_question)
-    # elif intent_id == add_prefix("GoodNight"):
-    #     txt = kia.GoodNight(hermes, intentMessage, conf, required_slot_question)
-    # elif intent_id == add_prefix("GoodMorning"):
-    #     txt = kia.GoodMorning(hermes, intentMessage, conf, required_slot_question)
+    if intent_id == add_prefix("SwitchLights"):
+        txt =   kia.SwitchLights(site_id, slots, required_slot_question)
+    elif intent_id == add_prefix("GetOpenWindows"):
+        txt = kia.GetOpenWindows(site_id, slots, required_slot_question)
+    elif intent_id == add_prefix("LeaveHouse"):
+        txt = kia.LeaveHouse(site_id, slots, required_slot_question)
+    elif intent_id == add_prefix("GoodNight"):
+        txt = kia.GoodNight(site_id, slots, required_slot_question)
+    elif intent_id == add_prefix("GoodMorning"):
+        txt = kia.GoodMorning(site_id, slots, required_slot_question)
     
     
     if txt == None:
