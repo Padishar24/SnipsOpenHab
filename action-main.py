@@ -44,7 +44,7 @@ def on_message_intent(client, userdata, msg):
     shortIntent = intent_id.split(":")[1]
     print ("Short Intent: " + shortIntent)
     handledIntent = True
-    if shortIntent in ["LampenAnSchalten", "LampenAusSchalten", "LampenDimmen"]:
+    if shortIntent in ["LampenAnSchalten", "LampenAusSchalten", "LichtDimmen"]:
         txt = kia.SwitchLights(intent_id, site_id, slots, required_slot_question)
     elif shortIntent == "openWindows":
         txt = kia.GetOpenWindows(site_id, slots, required_slot_question)
