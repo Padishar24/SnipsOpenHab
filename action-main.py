@@ -50,23 +50,23 @@ def on_message_intent(client, userdata, msg):
             if custom_data and 'past_intent' in custom_data.keys():
                 slots.update (custom_data['slots'])
                 print ("Updated slots: " + json.dumps(slots))
-                txt = kia.SwitchLights(custom_data['past_intent'], site_id, slots, required_slot_question)
+                (txt, required_slot_question) = kia.SwitchLights(custom_data['past_intent'], site_id, slots)
         else:
-            txt = kia.SwitchLights(intent_id, site_id, slots, required_slot_question)
+            (txt, required_slot_question) = kia.SwitchLights(intent_id, site_id, slots)
     elif shortIntent == "openWindows":
-        txt = kia.GetOpenWindows(site_id, slots, required_slot_question)
+        (txt, required_slot_question) = kia.GetOpenWindows(site_id, slots)
     elif shortIntent == "goodBye":
-        txt = kia.LeaveHouse(site_id, slots, required_slot_question)
+        (txt, required_slot_question) = kia.LeaveHouse(site_id, slots)
     elif shortIntent == "goodNight":
-        txt = kia.GoodNight(site_id, slots, required_slot_question)
+        (txt, required_slot_question) = kia.GoodNight(site_id, slots)
     elif shortIntent == "goodMorning":
-        txt = kia.GoodMorning(site_id, slots, required_slot_question)
+        (txt, required_slot_question) = kia.GoodMorning(site_id, slots)
     else:
         handledIntent = False
         
     if handledIntent:
         print ("Response: " + json.dumps(required_slot_question))
-        if txt == None:
+        if txt == None and len(required_slot_question) > 0:
             slot = next(iter(required_slot_question))
             response = required_slot_question[slot]["response"]
             intend = required_slot_question[slot]["intend"]
