@@ -1,4 +1,4 @@
 # Bindings for the hermes protocol 
-hermes-python>=0.2
 python-openhab>=2.10.2
 paho-mqtt>=1.4.0
+toml>=0.10.0
