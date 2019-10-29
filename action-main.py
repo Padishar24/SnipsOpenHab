@@ -43,6 +43,7 @@ def on_message_intent(client, userdata, msg):
     txt = "Ich verstehe dich nicht."
     shortIntent = intent_id.split(":")[1]
     print ("Short Intent: " + shortIntent)
+    handledIntent = True
     if shortIntent in ["LampenAnSchalten", "LampenAusSchalten", "LampenDimmen"]:
         txt = kia.SwitchLights(intent_id, site_id, slots, required_slot_question)
     elif shortIntent == "openWindows":
@@ -53,69 +54,20 @@ def on_message_intent(client, userdata, msg):
         txt = kia.GoodNight(site_id, slots, required_slot_question)
     elif shortIntent == "goodMorning":
         txt = kia.GoodMorning(site_id, slots, required_slot_question)
-        
-    print ("Response: " + json.dumps(required_slot_question))
-    if txt == None:
-        slot = next(iter(required_slot_question))
-        response = required_slot_question[slot]["response"]
-        intend = required_slot_question[slot]["intend"]
-        custom_data = {'past_intent': intent_id, 'siteId': data['siteId'], 'slots': slots}
-        dialogue(session_id, response, [add_prefix(intend)], custom_data=custom_data)
-        #KolfsInselAutomation.ContinueSession (hermes, intentMessage, required_slot_question)
     else:
-        say(session_id, txt)   
-        #hermes.publish_end_session(intentMessage.session_id, txt)
-
-    # if intent_id == add_prefix('newAlarm'):
-    #     # create new alarm with the given properties
-    #     slots = get_slots(data)
-    #     say(session_id, alarmclock.new_alarm(slots, data['siteId']))
-
-    # elif intent_id == add_prefix('getAlarms'):
-    #     # say alarms with the given properties
-    #     slots = get_slots(data)
-    #     say(session_id, alarmclock.get_alarms(slots, data['siteId']))
-
-    # elif intent_id == add_prefix('getNextAlarm'):
-    #     # say next alarm
-    #     slots = get_slots(data)
-    #     say(session_id, alarmclock.get_next_alarm(slots, data['siteId']))
-
-    # elif intent_id == add_prefix('getMissedAlarms'):
-    #     # say missed alarms with the given properties
-    #     slots = get_slots(data)
-    #     say(session_id, alarmclock.get_missed_alarms(slots, data['siteId']))
-
-    # elif intent_id == add_prefix('deleteAlarms'):
-    #     # delete alarms with the given properties
-    #     slots = get_slots(data)
-    #     alarms, response = alarmclock.delete_alarms_try(slots, data['siteId'])
-    #     if alarms:
-    #         custom_data = {'past_intent': intent_id,
-    #                        'siteId': data['siteId'],
-    #                        'slots': slots}
-    #         dialogue(session_id, response, [add_prefix('confirmAlarm')], custom_data=custom_data)
-    #     else:
-    #         say(session_id, response)
-
-    # elif intent_id == add_prefix('confirmAlarm'):
-    #     custom_data = json.loads(data['customData'])
-    #     if custom_data and 'past_intent' in custom_data.keys():
-    #         slots = get_slots(data)
-    #         if 'answer' in slots.keys() and \
-    #                 slots['answer'] == "yes" and \
-    #                 custom_data['past_intent'] == add_prefix('deleteAlarms'):
-    #             response = alarmclock.delete_alarms(custom_data['slots'], custom_data['siteId'])
-    #             say(session_id, response)
-    #         else:
-    #             end_session(session_id)
-    #         alarmclock.temp_memory[data['siteId']] = None
-
-    # elif intent_id == add_prefix('answerAlarm'):
-    #     slots = get_slots(data)
-    #     say(session_id, alarmclock.answer_alarm(slots, data['siteId']))
+        handledIntent = False
+        
+    if handledIntent:
+        print ("Response: " + json.dumps(required_slot_question))
+        if txt == None:
+            slot = next(iter(required_slot_question))
+            response = required_slot_question[slot]["response"]
+            intend = required_slot_question[slot]["intend"]
+            custom_data = {'past_intent': intent_id, 'siteId': data['siteId'], 'slots': slots}
+            dialogue(session_id, response, [add_prefix(intend)], custom_data=custom_data)
+        else:
+            say(session_id, txt)   
   
-
 def say(session_id, text):
     mqtt_client.publish('hermes/dialogueManager/endSession', json.dumps({'text': text,
                                                                          'sessionId': session_id}))
