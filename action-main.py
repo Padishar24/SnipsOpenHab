@@ -41,17 +41,20 @@ def on_message_intent(client, userdata, msg):
 
     required_slot_question = {}
     txt = "Ich verstehe dich nicht."
-    if intent_id in [add_prefix("LampenAnSchalten"), add_prefix("LampenAusSchalten"), add_prefix("LampenDimmen")]:
-        txt =   kia.SwitchLights(intent_id, site_id, slots, required_slot_question)
-    elif intent_id == add_prefix("openWindows"):
+    shortIntent = intent_id.split(":")[1]
+    print ("Short Intent: " + shortIntent)
+    if shortIntent in ["LampenAnSchalten", "LampenAusSchalten", "LampenDimmen"]:
+        txt = kia.SwitchLights(intent_id, site_id, slots, required_slot_question)
+    elif shortIntent == "openWindows":
         txt = kia.GetOpenWindows(site_id, slots, required_slot_question)
-    elif intent_id == add_prefix("goodBye"):
+    elif shortIntent == "goodBye":
         txt = kia.LeaveHouse(site_id, slots, required_slot_question)
-    elif intent_id == add_prefix("goodNight"):
+    elif shortIntent == "goodNight":
         txt = kia.GoodNight(site_id, slots, required_slot_question)
-    elif intent_id == add_prefix("goodMorning"):
+    elif shortIntent == "goodMorning":
         txt = kia.GoodMorning(site_id, slots, required_slot_question)
         
+    print ("Response: " + json.dumps(required_slot_question))
     if txt == None:
         slot = next(iter(required_slot_question))
         response = required_slot_question[slot]["response"]
