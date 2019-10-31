@@ -5,6 +5,29 @@ import paho.mqtt.client as mqtt
 import json
 import toml
 import KolfsInselAutomation
+import configparser
+import io
+from CalDavCalendar import Calendar
+from datetime import date, datetime, timedelta, timezone
+from pytz import timezone
+import calendar
+
+CONFIGURATION_ENCODING_FORMAT = "utf-8"
+CONFIG_INI = "config.ini"
+
+class SnipsConfigParser(configparser.SafeConfigParser):
+    def to_dict(self):
+        return {section : {option_name : option for option_name, option in self.items(section)} for section in self.sections()}
+
+
+def read_configuration_file(configuration_file):
+    try:
+        with io.open(configuration_file, encoding=CONFIGURATION_ENCODING_FORMAT) as f:
+            conf_parser = SnipsConfigParser()
+            conf_parser.readfp(f)
+            return conf_parser.to_dict()
+    except (IOError, configparser.Error) as e:
+        return dict()
 
 USERNAME_INTENTS = "burkhardzeiner"
 MQTT_BROKER_ADDRESS = "localhost:1883"
@@ -29,6 +52,38 @@ def get_slots(data):
         slot_dict = {}
     return slot_dict
 
+def getTimeRange (slotData):
+    kind = slotData["kind"]
+    when = None
+    until = None
+    if kind == "TimeInterval":        
+        when = datetime.strptime(slotData["from"][:-7], '%Y-%m-%d %H:%M:%S').replace(tzinfo=timezone('Europe/Amsterdam'))
+        until = datetime.strptime(slotData["to"][:-7], '%Y-%m-%d %H:%M:%S').replace(tzinfo=timezone('Europe/Amsterdam'))
+    elif kind == "InstantTime":
+        when = datetime.strptime(slotData["value"][:-7], '%Y-%m-%d %H:%M:%S').replace(tzinfo=timezone('Europe/Amsterdam'))
+        delta = None
+        if slotData["grain"] == "Year":
+            delta = timedelta(days=365)
+        elif slotData["grain"] == "Quarter":
+            delta = timedelta(days=365/4)
+        elif slotData["grain"] == "Month":
+            delta = timedelta(days=365/4)
+        elif slotData["grain"] == "Week":
+            end = date(year=when.year, month=when.month, day=calendar.monthrange(when.year, when.month)[1])
+            delta = end - when
+        elif slotData["grain"] == "Day":
+            delta = timedelta(days=1)
+        elif slotData["grain"] == "Hour":
+            delta = timedelta(hours=1)
+        elif slotData["grain"] == "Minute":
+            delta = timedelta(minutes=1)
+        elif slotData["grain"] == "Second":
+            delta = timedelta(seconds=1)
+        until = when + delta
+
+    # TODO: precision: <“Exact”, “Approximate">
+
+    return (when, until)
 
 def on_message_intent(client, userdata, msg):
     data = json.loads(msg.payload.decode("utf-8"))
@@ -61,6 +116,19 @@ def on_message_intent(client, userdata, msg):
         (txt, required_slot_question) = kia.GoodNight(site_id, slots)
     elif shortIntent == "goodMorning":
         (txt, required_slot_question) = kia.GoodMorning(site_id, slots)
+    elif shortIntent == "getAppointments":
+        conf = read_configuration_file(CONFIG_INI)
+        try:
+            (when, until) = getTimeRange(slots["date"])
+            if when and until:
+                calendar = Calendar(conf)
+                txt = calendar.getAppointments (when, until)
+                required_slot_question = None
+            else:
+                txt = "Zeitbereich unklar!"
+        except:
+            txt = "Fehler!"
+
     else:
         handledIntent = False
         
