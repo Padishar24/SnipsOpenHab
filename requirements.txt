@@ -4,4 +4,7 @@ paho-mqtt>=1.4.0
 toml>=0.10.0
 ssml-builder>=1.1.1
 pyssml>=0.1.3
+caldav>=0.6.1
+icalendar>=4.0.3
+urllib3>=1.25.6
 
