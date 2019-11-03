@@ -15,7 +15,7 @@ MQTT_BROKER_ADDRESS = "localhost:1883"
 MQTT_USERNAME = None
 MQTT_PASSWORD = None
 
-gRadioIsPlaying = None
+gRadioIsPlaying = False
 
 def add_prefix(intent_name):
     return USERNAME_INTENTS + ":" + intent_name
@@ -27,6 +27,7 @@ def on_message_intent(client, userdata, msg):
     txt = "Ich verstehe dich nicht."
     shortIntent = intentMsg.intent_id.split(":")[1]
     print ("Short Intent: " + shortIntent)
+    print ("   Slots: " + json.dumps(intentMsg.slots))
     handledIntent = True
     if shortIntent in ["LampenAnSchalten", "LampenAusSchalten", "LichtDimmen", "lightDimPercentage"]:
         if shortIntent == "lightDimPercentage":
@@ -98,11 +99,12 @@ def dialogue(session_id, text, intent_filter, custom_data=None):
 def onDialogSessionStarted(client, userdata, msg):
     print ("**** SESSION START DETECTED ****")
     global gRadioIsPlaying
-    gRadioIsPlaying = isRadioPlaying()
-    if gRadioIsPlaying:
-        subprocess.call("mpc stop", shell=True)
-        subprocess.call("mpc volume 100", shell=True)
-    
+    if not gRadioIsPlaying:
+        gRadioIsPlaying = isRadioPlaying()
+        if gRadioIsPlaying:
+            subprocess.call("mpc stop", shell=True)
+            subprocess.call("mpc volume 100", shell=True)
+        
 
 def onDialogSessionEnded(client, userdata, msg):
     print ("**** SESSION END DETECTED ****")
