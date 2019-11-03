@@ -6,13 +6,16 @@ import json
 import toml
 import KolfsInselAutomation
 from CalDavCalendar import Calendar
-from Tools import IntentMsg, getTimeRange
+from Tools import IntentMsg, getTimeRange, isRadioPlaying
 import datetime
+import subprocess 
 
 USERNAME_INTENTS = "burkhardzeiner"
 MQTT_BROKER_ADDRESS = "localhost:1883"
 MQTT_USERNAME = None
 MQTT_PASSWORD = None
+
+gRadioIsPlaying = None
 
 def add_prefix(intent_name):
     return USERNAME_INTENTS + ":" + intent_name
@@ -94,11 +97,18 @@ def dialogue(session_id, text, intent_filter, custom_data=None):
 
 def onDialogSessionStarted(client, userdata, msg):
     print ("**** SESSION START DETECTED ****")
-    pass
+    gRadioIsPlaying = isRadioPlaying()
+    if gRadioIsPlaying:
+        subprocess.call("mpc stop", shell=True)
+        subprocess.call("mpc volume 100", shell=True)
+    
 
 def onDialogSessionEnded(client, userdata, msg):
     print ("**** SESSION END DETECTED ****")
-    pass
+    if gRadioIsPlaying:
+        gRadioIsPlaying = False
+        subprocess.call("mpc play", shell=True)
+        subprocess.call("mpc volume 85", shell=True)
 
 
 if __name__ == "__main__":
@@ -112,12 +122,12 @@ if __name__ == "__main__":
 
     mqtt_client = mqtt.Client()
     mqtt_client.message_callback_add('hermes/intent/#', on_message_intent)
-    mqtt_client.message_callback_add ('hermes/dialogueManager/sessionStarted', onDialogSessionStarted)
-    mqtt_client.message_callback_add ('hermes/dialogueManager/sessionEnded', onDialogSessionEnded)
+    mqtt_client.message_callback_add ('hermes/hotword/toggleOff', onDialogSessionStarted)
+    mqtt_client.message_callback_add ('hermes/hotword/toggleOn', onDialogSessionEnded)
     mqtt_client.username_pw_set(MQTT_USERNAME, MQTT_PASSWORD)
     mqtt_client.connect(MQTT_BROKER_ADDRESS.split(":")[0], int(MQTT_BROKER_ADDRESS.split(":")[1]))
     mqtt_client.subscribe('hermes/intent/#')
-    mqtt_client.subscribe ('hermes/dialogueManager/sessionStarted')
-    mqtt_client.subscribe ('hermes/dialogueManager/sessionEnded')
+    mqtt_client.subscribe ('hermes/hotword/toggleOff')
+    mqtt_client.subscribe ('hermes/hotword/toggleOn')
     kia = KolfsInselAutomation.KolfsInselAutomation()
     mqtt_client.loop_forever()

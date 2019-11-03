@@ -4,6 +4,7 @@ import calendar
 from datetime import date, datetime, timedelta, timezone
 from pytz import timezone
 import json
+from subprocess import check_output
 
 CONFIGURATION_ENCODING_FORMAT = "utf-8"
 CONFIG_INI = "config.ini"
@@ -22,6 +23,11 @@ def read_configuration_file(configuration_file = CONFIG_INI):
     except (IOError, configparser.Error) as e:
         return dict()
 
+def isRadioPlaying():
+    out = check_output(["mpc"]).decode("utf-8")
+    if out.find ("playing") != -1:
+        return True
+    return False
 
 def getTimeRange (slotData):
     kind = slotData["kind"]
