@@ -6,7 +6,7 @@ import json
 import toml
 import KolfsInselAutomation
 from CalDavCalendar import Calendar
-from Tools import IntentMsg, getTimeRange, get_slots, read_configuration_file
+from Tools import IntentMsg, getTimeRange
 import datetime
 
 USERNAME_INTENTS = "burkhardzeiner"
