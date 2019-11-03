@@ -1,0 +1,24 @@
+{
+    "input": "welche termine habe in diesen monat",
+    "intent": {
+      "intentName": "burkhardzeiner:getAppointments",
+      "confidenceScore": 0.64194703
+    },
+    "slots": [
+      {
+        "rawValue": "in diesen monat",
+        "value": {
+          "kind": "InstantTime",
+          "value": "2019-11-01 00:00:00 +00:00",
+          "grain": "Month",
+          "precision": "Exact"
+        },
+        "range": {
+          "start": 20,
+          "end": 35
+        },
+        "entity": "snips/datetime",
+        "slotName": "date"
+      }
+    ]
+  }

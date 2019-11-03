@@ -1,0 +1,24 @@
+{
+    "input": "welche termine habe ich übermorgen",
+    "intent": {
+      "intentName": "burkhardzeiner:getAppointments",
+      "confidenceScore": 1
+    },
+    "slots": [
+      {
+        "rawValue": "übermorgen",
+        "value": {
+          "kind": "InstantTime",
+          "value": "2019-11-04 00:00:00 +00:00",
+          "grain": "Day",
+          "precision": "Exact"
+        },
+        "range": {
+          "start": 24,
+          "end": 34
+        },
+        "entity": "snips/datetime",
+        "slotName": "date"
+      }
+    ]
+  }

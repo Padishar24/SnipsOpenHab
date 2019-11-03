@@ -1,0 +1,23 @@
+{
+    "input": "welche termine habe ich in den nächsten zwei wochen",
+    "intent": {
+      "intentName": "burkhardzeiner:getAppointments",
+      "confidenceScore": 1
+    },
+    "slots": [
+      {
+        "rawValue": "in den nächsten zwei wochen",
+        "value": {
+          "kind": "TimeInterval",
+          "from": "2019-11-04 00:00:00 +00:00",
+          "to": "2019-11-18 00:00:00 +00:00"
+        },
+        "range": {
+          "start": 24,
+          "end": 51
+        },
+        "entity": "snips/datetime",
+        "slotName": "date"
+      }
+    ]
+  }

@@ -1,0 +1,24 @@
+{
+    "input": "welche termine habe ich jetzt",
+    "intent": {
+      "intentName": "burkhardzeiner:getAppointments",
+      "confidenceScore": 1
+    },
+    "slots": [
+      {
+        "rawValue": "jetzt",
+        "value": {
+          "kind": "InstantTime",
+          "value": "2019-11-02 06:00:33.119080846 +00:00",
+          "grain": "Second",
+          "precision": "Exact"
+        },
+        "range": {
+          "start": 24,
+          "end": 29
+        },
+        "entity": "snips/datetime",
+        "slotName": "date"
+      }
+    ]
+  }

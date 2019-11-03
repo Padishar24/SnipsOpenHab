@@ -1,0 +1,24 @@
+{
+    "input": "welche termine habe ich in der nächsten stunde",
+    "intent": {
+      "intentName": "burkhardzeiner:getAppointments",
+      "confidenceScore": 1
+    },
+    "slots": [
+      {
+        "rawValue": "in der nächsten stunde",
+        "value": {
+          "kind": "InstantTime",
+          "value": "2019-11-02 07:00:00 +00:00",
+          "grain": "Hour",
+          "precision": "Exact"
+        },
+        "range": {
+          "start": 24,
+          "end": 46
+        },
+        "entity": "snips/datetime",
+        "slotName": "date"
+      }
+    ]
+  }

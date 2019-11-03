@@ -5,29 +5,9 @@ import paho.mqtt.client as mqtt
 import json
 import toml
 import KolfsInselAutomation
-import configparser
-import io
 from CalDavCalendar import Calendar
-from datetime import date, datetime, timedelta, timezone
-from pytz import timezone
-import calendar
-
-CONFIGURATION_ENCODING_FORMAT = "utf-8"
-CONFIG_INI = "config.ini"
-
-class SnipsConfigParser(configparser.SafeConfigParser):
-    def to_dict(self):
-        return {section : {option_name : option for option_name, option in self.items(section)} for section in self.sections()}
-
-
-def read_configuration_file(configuration_file):
-    try:
-        with io.open(configuration_file, encoding=CONFIGURATION_ENCODING_FORMAT) as f:
-            conf_parser = SnipsConfigParser()
-            conf_parser.readfp(f)
-            return conf_parser.to_dict()
-    except (IOError, configparser.Error) as e:
-        return dict()
+from Tools import IntentMsg, getTimeRange, get_slots, read_configuration_file
+import datetime
 
 USERNAME_INTENTS = "burkhardzeiner"
 MQTT_BROKER_ADDRESS = "localhost:1883"
@@ -37,98 +17,50 @@ MQTT_PASSWORD = None
 def add_prefix(intent_name):
     return USERNAME_INTENTS + ":" + intent_name
 
-def get_slots(data):
-    slot_dict = {}
-    try:
-        for slot in data['slots']:
-            if slot['value']['kind'] in ["InstantTime", "TimeInterval", "Duration"]:
-                slot_dict[slot['slotName']] = slot['value']
-            else:
-                slot_dict[slot['slotName']] = slot['value']['value']
-            # elif slot['value']['kind'] == "Custom":
-                # slot_dict[slot['slotName']] = slot['value']['value']
-    except (KeyError, TypeError, ValueError) as e:
-        print("Error: ", e)
-        slot_dict = {}
-    return slot_dict
-
-def getTimeRange (slotData):
-    kind = slotData["kind"]
-    when = None
-    until = None
-    if kind == "TimeInterval":        
-        when = datetime.strptime(slotData["from"][:-7], '%Y-%m-%d %H:%M:%S').replace(tzinfo=timezone('Europe/Amsterdam'))
-        until = datetime.strptime(slotData["to"][:-7], '%Y-%m-%d %H:%M:%S').replace(tzinfo=timezone('Europe/Amsterdam'))
-    elif kind == "InstantTime":
-        when = datetime.strptime(slotData["value"][:-7], '%Y-%m-%d %H:%M:%S').replace(tzinfo=timezone('Europe/Amsterdam'))
-        delta = None
-        if slotData["grain"] == "Year":
-            delta = timedelta(days=365)
-        elif slotData["grain"] == "Quarter":
-            delta = timedelta(days=365/4)
-        elif slotData["grain"] == "Month":
-            delta = timedelta(days=365/4)
-        elif slotData["grain"] == "Week":
-            end = date(year=when.year, month=when.month, day=calendar.monthrange(when.year, when.month)[1])
-            delta = end - when
-        elif slotData["grain"] == "Day":
-            delta = timedelta(days=1)
-        elif slotData["grain"] == "Hour":
-            delta = timedelta(hours=1)
-        elif slotData["grain"] == "Minute":
-            delta = timedelta(minutes=1)
-        elif slotData["grain"] == "Second":
-            delta = timedelta(seconds=1)
-        until = when + delta
-
-    # TODO: precision: <“Exact”, “Approximate">
-
-    return (when, until)
-
 def on_message_intent(client, userdata, msg):
-    data = json.loads(msg.payload.decode("utf-8"))
-    print (json.dumps(data))
-    session_id = data['sessionId']
-    intent_id = data['intent']['intentName']
-    site_id = data['siteId']
-    slots = get_slots (data)
-    print (json.dumps(slots))
+    intentMsg = IntentMsg(msg)
 
     required_slot_question = {}
     txt = "Ich verstehe dich nicht."
-    shortIntent = intent_id.split(":")[1]
+    shortIntent = intentMsg.intent_id.split(":")[1]
     print ("Short Intent: " + shortIntent)
     handledIntent = True
     if shortIntent in ["LampenAnSchalten", "LampenAusSchalten", "LichtDimmen", "lightDimPercentage"]:
         if shortIntent == "lightDimPercentage":
-            custom_data = json.loads(data['customData'])
-            if custom_data and 'past_intent' in custom_data.keys():
-                slots.update (custom_data['slots'])
-                print ("Updated slots: " + json.dumps(slots))
-                (txt, required_slot_question) = kia.SwitchLights(custom_data['past_intent'], site_id, slots)
+            if intentMsg.custom_data and 'past_intent' in intentMsg.custom_data.keys():
+                intentMsg.slots.update (intentMsg.custom_data['slots'])
+                (txt, required_slot_question) = kia.SwitchLights(intentMsg.custom_data['past_intent'], intentMsg.site_id, intentMsg.slots)
         else:
-            (txt, required_slot_question) = kia.SwitchLights(intent_id, site_id, slots)
+            (txt, required_slot_question) = kia.SwitchLights(intentMsg.intent_id, intentMsg.site_id, intentMsg.slots)
     elif shortIntent == "openWindows":
-        (txt, required_slot_question) = kia.GetOpenWindows(site_id, slots)
+        (txt, required_slot_question) = kia.GetOpenWindows(intentMsg.site_id, intentMsg.slots)
     elif shortIntent == "goodBye":
-        (txt, required_slot_question) = kia.LeaveHouse(site_id, slots)
+        (txt, required_slot_question) = kia.LeaveHouse(intentMsg.site_id, intentMsg.slots)
     elif shortIntent == "goodNight":
-        (txt, required_slot_question) = kia.GoodNight(site_id, slots)
+        (txt, required_slot_question) = kia.GoodNight(intentMsg.site_id, intentMsg.slots)
     elif shortIntent == "goodMorning":
-        (txt, required_slot_question) = kia.GoodMorning(site_id, slots)
+        (txt, required_slot_question) = kia.GoodMorning(intentMsg.site_id, intentMsg.slots)
+
+        if txt:
+            calendar = Calendar(intentMsg.config)
+            
+            today = datetime.datetime.combine(datetime.date.today(), datetime.datetime.min.time())
+            tomorrow = today + datetime.timedelta(days=1)
+            appointmentsInSpeak = calendar.getAppointments (today, tomorrow, includeSpeakTag=False)
+
+            if appointmentsInSpeak:
+                txt = "<speak><s>" + txt + "</s><p>Folgende Termine stehen heute an:</p>" + appointmentsInSpeak + "</speak>"
+
     elif shortIntent == "getAppointments":
-        conf = read_configuration_file(CONFIG_INI)
         try:
-            (when, until) = getTimeRange(slots["date"])
+            (when, until) = getTimeRange(intentMsg.slots["date"])
             if when and until:
-                calendar = Calendar(conf)
+                calendar = Calendar(intentMsg.config)
                 txt = calendar.getAppointments (when, until)
-                required_slot_question = None
             else:
                 txt = "Zeitbereich unklar!"
         except:
             txt = "Fehler!"
-
     else:
         handledIntent = False
         
@@ -138,10 +70,10 @@ def on_message_intent(client, userdata, msg):
             slot = next(iter(required_slot_question))
             response = required_slot_question[slot]["response"]
             intend = required_slot_question[slot]["intend"]
-            custom_data = {'past_intent': intent_id, 'siteId': data['siteId'], 'slots': slots}
-            dialogue(session_id, response, [add_prefix(intend)], custom_data=custom_data)
+            custom_data = {'past_intent': intentMsg.intent_id, 'siteId': intentMsg.site_id, 'slots': intentMsg.slots}
+            dialogue(intentMsg.session_id, response, [add_prefix(intend)], custom_data=custom_data)
         else:
-            say(session_id, txt)   
+            say(intentMsg.session_id, txt)   
   
 def say(session_id, text):
     mqtt_client.publish('hermes/dialogueManager/endSession', json.dumps({'text': text,
@@ -160,6 +92,14 @@ def dialogue(session_id, text, intent_filter, custom_data=None):
         data['customData'] = json.dumps(custom_data)
     mqtt_client.publish('hermes/dialogueManager/continueSession', json.dumps(data))
 
+def onDialogSessionStarted(client, userdata, msg):
+    print ("**** SESSION START DETECTED ****")
+    pass
+
+def onDialogSessionEnded(client, userdata, msg):
+    print ("**** SESSION END DETECTED ****")
+    pass
+
 
 if __name__ == "__main__":
     snips_config = toml.load('/etc/snips.toml')
@@ -172,8 +112,12 @@ if __name__ == "__main__":
 
     mqtt_client = mqtt.Client()
     mqtt_client.message_callback_add('hermes/intent/#', on_message_intent)
+    mqtt_client.message_callback_add ('hermes/dialogueManager/sessionStarted', onDialogSessionStarted)
+    mqtt_client.message_callback_add ('hermes/dialogueManager/sessionEnded', onDialogSessionEnded)
     mqtt_client.username_pw_set(MQTT_USERNAME, MQTT_PASSWORD)
     mqtt_client.connect(MQTT_BROKER_ADDRESS.split(":")[0], int(MQTT_BROKER_ADDRESS.split(":")[1]))
     mqtt_client.subscribe('hermes/intent/#')
+    mqtt_client.subscribe ('hermes/dialogueManager/sessionStarted')
+    mqtt_client.subscribe ('hermes/dialogueManager/sessionEnded')
     kia = KolfsInselAutomation.KolfsInselAutomation()
     mqtt_client.loop_forever()

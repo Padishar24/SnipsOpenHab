@@ -3,3 +3,5 @@ python-openhab>=2.10.2
 paho-mqtt>=1.4.0
 toml>=0.10.0
 ssml-builder>=1.1.1
+pyssml>=0.1.3
+
