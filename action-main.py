@@ -97,6 +97,7 @@ def dialogue(session_id, text, intent_filter, custom_data=None):
 
 def onDialogSessionStarted(client, userdata, msg):
     print ("**** SESSION START DETECTED ****")
+    global gRadioIsPlaying
     gRadioIsPlaying = isRadioPlaying()
     if gRadioIsPlaying:
         subprocess.call("mpc stop", shell=True)
@@ -105,6 +106,7 @@ def onDialogSessionStarted(client, userdata, msg):
 
 def onDialogSessionEnded(client, userdata, msg):
     print ("**** SESSION END DETECTED ****")
+    global gRadioIsPlaying
     if gRadioIsPlaying:
         gRadioIsPlaying = False
         subprocess.call("mpc play", shell=True)
