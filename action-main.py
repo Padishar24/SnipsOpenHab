@@ -38,6 +38,10 @@ def on_message_intent(client, userdata, msg):
             (txt, required_slot_question) = kia.SwitchLights(intentMsg.intent_id, intentMsg.site_id, intentMsg.slots)
     elif shortIntent == "openWindows":
         (txt, required_slot_question) = kia.GetOpenWindows(intentMsg.site_id, intentMsg.slots)
+    elif shortIntent == "Rollladen":
+        (txt, required_slot_question) = kia.MoveCovers(intentMsg.site_id, intentMsg.slots)
+    elif shortIntent == "RollladenSetPosition":
+        (txt, required_slot_question) = kia.SetCoverPosition(intentMsg.site_id, intentMsg.slots)
     elif shortIntent == "goodBye":
         (txt, required_slot_question) = kia.LeaveHouse(intentMsg.site_id, intentMsg.slots)
     elif shortIntent == "goodNight":
