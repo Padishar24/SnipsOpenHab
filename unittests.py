@@ -54,13 +54,13 @@ def WelcheTermineHabeIchInDerNaechstenStunde():
 def UnitTest_Calendar():
     tests = [
         "WelcheTermineHabeIchMorgen", 
-        "WelcheTermineHabeIchInDieserWoche",
-        "WelcheTermineHabeIchDiesenMonat",
-        "WelcheTermineHabeIchInDiesemViertelJahr",
-        "WelcheTermineHabeIchJetzt",
-        "WelcheTerminHabeIchIndenNaechstenZweiWochen",
-        "WelcheTermineHabeIchÜbermorgen",
-        "WelcheTermineHabeIchInDerNaechstenStunde"
+        # "WelcheTermineHabeIchInDieserWoche",
+        # "WelcheTermineHabeIchDiesenMonat",
+        # "WelcheTermineHabeIchInDiesemViertelJahr",
+        # "WelcheTermineHabeIchJetzt",
+        # "WelcheTerminHabeIchIndenNaechstenZweiWochen",
+        # "WelcheTermineHabeIchÜbermorgen",
+        # "WelcheTermineHabeIchInDerNaechstenStunde"
     ]
     
     config = {}
@@ -81,7 +81,7 @@ def UnitTest_Calendar():
         
         if when and until:
             txt = calendar.getAppointments (when, until)
-            if len(txt) > 100:
+            if len(txt) > 200:
                 print ("    Calendar Test %s:   %s" % (test, ("Answer with %d characters" % len(txt))))
             else:
                 print ("    Calendar Test %s:   %s" % (test, txt))
@@ -100,7 +100,7 @@ UnitTests = [
             #  ("Welche Termine habe ich in den nächsten zwei Wochen?", WelcheTermineHabeIchInDenNächstenZweiWochen),
             #  ("Welche Termine habe ich übermorgen?", WelcheTermineHabeIchÜbermorgen),
             #  ("Welche Termine habe ich in der nächsten Stunde?", WelcheTermineHabeIchInDerNaechstenStunde),
-            #  ("CalDavCalendar", UnitTest_Calendar)
+              ("CalDavCalendar", UnitTest_Calendar)
              ]
 
 

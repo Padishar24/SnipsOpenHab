@@ -50,10 +50,10 @@ def on_message_intent(client, userdata, msg):
             
             today = datetime.datetime.combine(datetime.date.today(), datetime.datetime.min.time())
             tomorrow = today + datetime.timedelta(days=1)
-            appointmentsInSpeak = calendar.getAppointments (today, tomorrow, includeSpeakTag=False)
+            appointmentsInSpeak = calendar.getAppointments (today, tomorrow)
 
             if appointmentsInSpeak:
-                txt = "<speak><s>" + txt + "</s><p>Folgende Termine stehen heute an:</p>" + appointmentsInSpeak + "</speak>"
+                txt = "<s>" + txt + "</s><p>Folgende Termine stehen heute an:</p>" + appointmentsInSpeak
 
     elif shortIntent == "getAppointments":
         try:
@@ -67,6 +67,10 @@ def on_message_intent(client, userdata, msg):
             txt = "Fehler!"
     else:
         handledIntent = False
+
+    if shortIntent == "stop":
+        global gRadioIsPlaying
+        gRadioIsPlaying = False # update global state so that alarm is not turned on again after handling this intent
         
     if handledIntent:
         print ("Response: " + json.dumps(required_slot_question))
