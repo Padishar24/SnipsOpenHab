@@ -5,6 +5,13 @@
     "version": "0.2.0",
     "configurations": [
         {
+            "name": "Python: test.py",
+            "type": "python",
+            "request": "launch",
+            "program": "E:\\documents\\_Projekte\\KolfsInselOpenHAB\\test.py",
+            "console": "integratedTerminal"
+        },
+        {
             "name": "Python: Aktuelle Datei",
             "type": "python",
             "request": "launch",

@@ -8,7 +8,8 @@ import KolfsInselAutomation
 from CalDavCalendar import Calendar
 from Tools import IntentMsg, getTimeRange, isRadioPlaying
 import datetime
-import subprocess 
+import subprocess
+from MyMightyGrocery import MyMightyGrocery 
 
 USERNAME_INTENTS = "burkhardzeiner"
 MQTT_BROKER_ADDRESS = "localhost:1883"
@@ -16,6 +17,7 @@ MQTT_USERNAME = None
 MQTT_PASSWORD = None
 
 gRadioIsPlaying = False
+myMightyGrocery = None
 
 def add_prefix(intent_name):
     return USERNAME_INTENTS + ":" + intent_name
@@ -69,6 +71,31 @@ def on_message_intent(client, userdata, msg):
                 txt = "Zeitbereich unklar!"
         except:
             txt = "Fehler!"
+    elif shortIntent == "getShoppingList":
+        global myMightyGrocery
+        if not myMightyGrocery:
+            myMightyGrocery = MyMightyGrocery (intentMsg.config["secret"]["mightygrocery_email"], intentMsg.config["secret"]["mightygrocery_pw"])
+            if not myMightyGrocery.login():
+                myMightyGrocery = None # close session
+        if myMightyGrocery:
+            try:
+                groceryList = intentMsg.slots["list"]
+                lists = myMightyGrocery.getShoppingLists ()
+                if groceryList not in lists:
+                    raise Exception()
+
+                items = myMightyGrocery.getShoppingList(groceryList)
+                if len(items) > 0:
+                    txt = ""
+                    for item in items:
+                        if item["unit"] != "Stk" and item["unit"] != "Stück":
+                            txt = txt + "<p>%s %s %s</p>" % (item["quantity", item["unit"], item["name"])
+                        else
+                            txt = txt + "<p>%s</p>" % item["name"]
+                else:
+                    txt = "Einkaufsliste %s ist leer" % groceryList
+            except:
+                txt = "Unbekannte Einkaufsliste"
     else:
         handledIntent = False
 
@@ -121,6 +148,9 @@ def onDialogSessionEnded(client, userdata, msg):
         gRadioIsPlaying = False
         subprocess.call("mpc play", shell=True)
         subprocess.call("mpc volume 85", shell=True)
+
+    global myMightyGrocery
+    myMightyGrocery = None # close web session
 
 
 if __name__ == "__main__":
