@@ -90,7 +90,7 @@ def on_message_intent(client, userdata, msg):
                     for item in items:
                         if item["unit"] != "Stk" and item["unit"] != "Stück":
                             txt = txt + "<p>%s %s %s</p>" % (item["quantity", item["unit"], item["name"])
-                        else
+                        else:
                             txt = txt + "<p>%s</p>" % item["name"]
                 else:
                     txt = "Einkaufsliste %s ist leer" % groceryList
