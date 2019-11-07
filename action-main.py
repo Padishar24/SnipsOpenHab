@@ -22,6 +22,16 @@ myMightyGrocery = None
 def add_prefix(intent_name):
     return USERNAME_INTENTS + ":" + intent_name
 
+def replaceUnitsWithAlias(unitStr):
+    unitStr = unitStr.replace ("kg", '<sub alias="Kilogramm">kg</sub>')        
+    unitStr = unitStr.replace ("Kg", '<sub alias="Kilogramm">Kg</sub>')
+    unitStr = unitStr.replace ("g", '<sub alias="Gramm">g</sub>')
+    unitStr = unitStr.replace ("G", '<sub alias="Gramm">G</sub>')
+    unitStr = unitStr.replace ("l", '<sub alias="Liter">l</sub>')
+    unitStr = unitStr.replace ("L", '<sub alias="Liter">L</sub>')
+    unitStr = unitStr.replace ("Stck", 'Stück')
+    return unitStr
+
 def on_message_intent(client, userdata, msg):
     intentMsg = IntentMsg(msg)
 
@@ -56,24 +66,28 @@ def on_message_intent(client, userdata, msg):
             
             today = datetime.datetime.combine(datetime.date.today(), datetime.datetime.min.time())
             tomorrow = today + datetime.timedelta(days=1)
-            appointmentsInSpeak = calendar.getAppointments (today, tomorrow)
+            (appointmentsInSpeak, errorMsg) = calendar.getAppointments (today, tomorrow)
 
             if appointmentsInSpeak:
                 txt = "<s>" + txt + "</s><p>Folgende Termine stehen heute an:</p>" + appointmentsInSpeak
+            elif errorMsg:
+                txt = "<s>" + txt + ("</s><p>%s</p>" % errorMsg)
 
     elif shortIntent == "getAppointments":
         try:
             (when, until) = getTimeRange(intentMsg.slots["date"])
             if when and until:
+                print ("Getting appointments...")
                 calendar = Calendar(intentMsg.config)
                 txt = calendar.getAppointments (when, until)
+                print ("Appointments: " + txt)
             else:
                 txt = "Zeitbereich unklar!"
         except:
             txt = "Fehler!"
     elif shortIntent == "getShoppingList":
         global myMightyGrocery
-        if not myMightyGrocery:
+        if not myMightyGrocery: # lazy creation
             myMightyGrocery = MyMightyGrocery (intentMsg.config["secret"]["mightygrocery_email"], intentMsg.config["secret"]["mightygrocery_pw"])
             if not myMightyGrocery.login():
                 myMightyGrocery = None # close session
@@ -88,12 +102,14 @@ def on_message_intent(client, userdata, msg):
                 if len(items) > 0:
                     txt = ""
                     for item in items:
-                        if item["unit"] != "Stk" and item["unit"] != "Stück":
-                            txt = txt + ("<p>%s %s %s</p>" % (item["quantity"], item["unit"], item["name"]))
-                        else:
+                        if item["unit"] in ["Stck", "Stück"]:
                             txt = txt + ("<p>%s</p>" % item["name"])
+                        else:
+                            txt = txt + ("<p>%s %s %s</p>" % (item["quantity"], replaceUnitsWithAlias(item["unit"]), item["name"]))
+                    
+                    
                 else:
-                    txt = "Einkaufsliste %s ist leer" % groceryList
+                    txt = "<say-as interpret-as="interjection">huch.</say-as>. Einkaufsliste %s ist leer" % groceryList
             except:
                 txt = "Unbekannte Einkaufsliste"
     else:
