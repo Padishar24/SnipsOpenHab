@@ -10,6 +10,7 @@ from Tools import IntentMsg, getTimeRange, isRadioPlaying
 import datetime
 import subprocess
 from MyMightyGrocery import MyMightyGrocery 
+import sys, traceback
 
 USERNAME_INTENTS = "burkhardzeiner"
 MQTT_BROKER_ADDRESS = "localhost:1883"
@@ -84,6 +85,10 @@ def on_message_intent(client, userdata, msg):
             else:
                 txt = "Zeitbereich unklar!"
         except:
+            print ('-'*60)
+            print ("Exception: " + sys.exc_info()[0])
+            traceback.print_exc(file=sys.stdout)
+            print ('-'*60)
             txt = "Fehler!"
     elif shortIntent == "getShoppingList":
         global myMightyGrocery
