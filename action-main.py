@@ -43,6 +43,9 @@ def replaceUnitsWithAlias(unitStr):
     return unitStr
 
 def on_message_intent(client, userdata, msg):
+    global myMightyGrocery
+    global gMyCurrentShop
+        
     intentMsg = IntentMsg(msg)
 
     required_slot_question = {}
@@ -103,7 +106,7 @@ def on_message_intent(client, userdata, msg):
             print ('-'*60)
             txt = "Fehler!"
     elif shortIntent == "getShoppingList":
-        global myMightyGrocery
+                
         if loginToMightyGrocery():
             try:
                 groceryList = intentMsg.slots["list"]
@@ -111,7 +114,6 @@ def on_message_intent(client, userdata, msg):
                 if groceryList not in lists:
                     raise Exception()
 
-                global gMyCurrentShop
                 gMyCurrentShop = groceryList
 
                 items = myMightyGrocery.getShoppingList(groceryList)
@@ -129,8 +131,6 @@ def on_message_intent(client, userdata, msg):
         else:
             txt = "Verbindung zur Einkaufsliste fehlgeschlagen."
     elif shortIntent == "addToShoppingList" or shortIntent == "addMoreToShoppingList":
-        global myMightyGrocery
-        global gMyCurrentShop
         if loginToMightyGrocery():
             list = None
             try:
