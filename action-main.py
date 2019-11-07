@@ -130,10 +130,12 @@ def on_message_intent(client, userdata, msg):
         else:
             txt = "Verbindung zur Einkaufsliste fehlgeschlagen."
     elif shortIntent == "addToShoppingList" or shortIntent == "addMoreToShoppingList":
+        print ("addToShoppingList - START")
         if intentMsg.custom_data and 'past_intent' in intentMsg.custom_data.keys():
             intentMsg.slots.update (intentMsg.custom_data['slots'])
             print ("   Updated Slots: " + json.dumps(intentMsg.slots))
         if loginToMightyGrocery(intentMsg.config["secret"]["mightygrocery_email"], intentMsg.config["secret"]["mightygrocery_pw"]):
+            print ("addToShoppingList - LOGGED IN")
             list = None
             try:
                 list = intentMsg.slots["shop"]
@@ -162,6 +164,7 @@ def on_message_intent(client, userdata, msg):
                         question = '<say-as interpret-as="interjection">alles klar.</say-as>. Noch mehr?'
                     else:
                         question = '<say-as interpret-as="interjection">huch.</say-as>. Das hat nicht geklappt. Möchtest Du etwas anderes auf die Liste setzen?'
+                    print ("addToShoppingList - AddItemToList CALLED")
                 else:
                     question = '<say-as interpret-as="interjection">huch.</say-as>. Da ist etwas schiefgegangen. Möchtest Du etwas anderes auf die Liste setzen?'
                     
