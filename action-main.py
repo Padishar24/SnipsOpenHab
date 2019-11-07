@@ -162,7 +162,7 @@ def on_message_intent(client, userdata, msg):
                 if item:
                     if shortIntent == "addMoreToShoppingList" and (item == "Nein" or item == "Fertig" or item == "Das wars"):
                         # Done adding more items
-                        txt = "<say-as interpret-as="interjection">bazinga.</say-as>"
+                        txt = '<say-as interpret-as="interjection">bazinga.</say-as>'
                         question = None
                         
                     else:
