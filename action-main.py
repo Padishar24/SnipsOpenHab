@@ -21,10 +21,10 @@ gRadioIsPlaying = False
 myMightyGrocery = None
 gMyCurrentShop = None
 
-def loginToMightyGrocery():
+def loginToMightyGrocery(user, pw):
     global myMightyGrocery
     if not myMightyGrocery: # lazy creation
-        myMightyGrocery = MyMightyGrocery (intentMsg.config["secret"]["mightygrocery_email"], intentMsg.config["secret"]["mightygrocery_pw"])
+        myMightyGrocery = MyMightyGrocery (user, pw)
         if not myMightyGrocery.login():
             myMightyGrocery = None # close session
     return myMightyGrocery is not None
@@ -105,9 +105,8 @@ def on_message_intent(client, userdata, msg):
             traceback.print_exc(file=sys.stdout)
             print ('-'*60)
             txt = "Fehler!"
-    elif shortIntent == "getShoppingList":
-                
-        if loginToMightyGrocery():
+    elif shortIntent == "getShoppingList":                
+        if loginToMightyGrocery(intentMsg.config["secret"]["mightygrocery_email"], intentMsg.config["secret"]["mightygrocery_pw"]):
             try:
                 groceryList = intentMsg.slots["list"]
                 lists = myMightyGrocery.getShoppingLists ()
@@ -131,7 +130,7 @@ def on_message_intent(client, userdata, msg):
         else:
             txt = "Verbindung zur Einkaufsliste fehlgeschlagen."
     elif shortIntent == "addToShoppingList" or shortIntent == "addMoreToShoppingList":
-        if loginToMightyGrocery():
+        if loginToMightyGrocery(intentMsg.config["secret"]["mightygrocery_email"], intentMsg.config["secret"]["mightygrocery_pw"]):
             list = None
             try:
                 list = intentMsg.slots["list"]
