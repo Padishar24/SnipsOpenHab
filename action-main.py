@@ -132,7 +132,7 @@ def on_message_intent(client, userdata, msg):
     elif shortIntent == "addToShoppingList" or shortIntent == "addMoreToShoppingList":
         print ("addToShoppingList - START")
         if intentMsg.custom_data and 'past_intent' in intentMsg.custom_data.keys():
-            if 'item' ind intentMsg.custom_data['slots'].keys():
+            if 'item' in intentMsg.custom_data['slots'].keys():
                 del intentMsg.custom_data['slots']['item']
             intentMsg.slots.update (intentMsg.custom_data['slots'])
             print ("   Updated Slots: " + json.dumps(intentMsg.slots))
