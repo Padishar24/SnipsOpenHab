@@ -19,6 +19,15 @@ MQTT_PASSWORD = None
 
 gRadioIsPlaying = False
 myMightyGrocery = None
+gMyCurrentShop = None
+
+def loginToMightyGrocery():
+    global myMightyGrocery
+    if not myMightyGrocery: # lazy creation
+        myMightyGrocery = MyMightyGrocery (intentMsg.config["secret"]["mightygrocery_email"], intentMsg.config["secret"]["mightygrocery_pw"])
+        if not myMightyGrocery.login():
+            myMightyGrocery = None # close session
+    return myMightyGrocery is not None
 
 def add_prefix(intent_name):
     return USERNAME_INTENTS + ":" + intent_name
@@ -95,16 +104,15 @@ def on_message_intent(client, userdata, msg):
             txt = "Fehler!"
     elif shortIntent == "getShoppingList":
         global myMightyGrocery
-        if not myMightyGrocery: # lazy creation
-            myMightyGrocery = MyMightyGrocery (intentMsg.config["secret"]["mightygrocery_email"], intentMsg.config["secret"]["mightygrocery_pw"])
-            if not myMightyGrocery.login():
-                myMightyGrocery = None # close session
-        if myMightyGrocery:
+        if loginToMightyGrocery():
             try:
                 groceryList = intentMsg.slots["list"]
                 lists = myMightyGrocery.getShoppingLists ()
                 if groceryList not in lists:
                     raise Exception()
+
+                global gMyCurrentShop
+                gMyCurrentShop = groceryList
 
                 items = myMightyGrocery.getShoppingList(groceryList)
                 if len(items) > 0:
@@ -113,13 +121,53 @@ def on_message_intent(client, userdata, msg):
                         if item["unit"] in ["Stck", "Stück"]:
                             txt = txt + ("<p>%s</p>" % item["name"])
                         else:
-                            txt = txt + ("<p>%s %s %s</p>" % (item["quantity"], replaceUnitsWithAlias(item["unit"]), item["name"]))
-                    
-                    
+                            txt = txt + ("<p>%s %s %s</p>" % (item["quantity"], replaceUnitsWithAlias(item["unit"]), item["name"]))    
                 else:
                     txt = '<say-as interpret-as="interjection">huch.</say-as>. Einkaufsliste %s ist leer' % groceryList
             except:
                 txt = "Unbekannte Einkaufsliste"
+        else:
+            txt = "Verbindung zur Einkaufsliste fehlgeschlagen."
+    elif shortIntent == "addToShoppingList" or shortIntent == "addMoreToShoppingList":
+        global myMightyGrocery
+        global gMyCurrentShop
+        if loginToMightyGrocery():
+            list = None
+            try:
+                list = intentMsg.slots["list"]
+            except:
+                list = gMyCurrentShop
+            if list:
+                item = ""
+                unit = None
+                quantity = None
+                try:
+                    item = intentMsg.slots["item"].strip().capitalize()
+                except:
+                    item = None
+                try:
+                    unit = intentMsg.slots["unit"]
+                except:
+                    pass
+                try:
+                    quantity = intentMsg.slots["quantity"]
+                except:
+                    pass
+
+                question = ""
+                if item:
+                    if myMightyGrocery.addItemToList(item, list, quantity, unit):
+                        question = '<say-as interpret-as="interjection">alles klar.</say-as>. Noch mehr?'
+                    else:
+                        question = '<say-as interpret-as="interjection">huch.</say-as>. Da ist etwas schiefgegangen. Möchtest Du etwas anderes auf die Liste setzen?'
+                else:
+                    question = '<say-as interpret-as="interjection">huch.</say-as>. Da ist etwas schiefgegangen. Möchtest Du etwas anderes auf die Liste setzen?'
+                    
+                # ask for more
+                required_slot_question["list"] = { "response": question, "intend": "addMoreToShoppingList"}
+            else:
+                # ask for list
+                required_slot_question["list"] = { "response": "Welche Liste möchtest Du bearbeiten?", "intend": "askForShoppingList"}
     else:
         handledIntent = False
 
