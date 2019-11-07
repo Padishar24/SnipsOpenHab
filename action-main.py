@@ -130,6 +130,9 @@ def on_message_intent(client, userdata, msg):
         else:
             txt = "Verbindung zur Einkaufsliste fehlgeschlagen."
     elif shortIntent == "addToShoppingList" or shortIntent == "addMoreToShoppingList":
+        if intentMsg.custom_data and 'past_intent' in intentMsg.custom_data.keys():
+            intentMsg.slots.update (intentMsg.custom_data['slots'])
+            print ("   Updated Slots: " + json.dumps(intentMsg.slots))
         if loginToMightyGrocery(intentMsg.config["secret"]["mightygrocery_email"], intentMsg.config["secret"]["mightygrocery_pw"]):
             list = None
             try:
@@ -147,7 +150,7 @@ def on_message_intent(client, userdata, msg):
                 try:
                     unit = intentMsg.slots["unit"]
                 except:
-                    pass
+                    unit = "Stck"
                 try:
                     quantity = intentMsg.slots["quantity"]
                 except:
