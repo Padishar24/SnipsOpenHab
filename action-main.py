@@ -160,17 +160,24 @@ def on_message_intent(client, userdata, msg):
 
                 question = ""
                 if item:
-                    if myMightyGrocery.addItemToList(item, list, quantity, unit):
-                        question = '<say-as interpret-as="interjection">alles klar.</say-as>. Noch mehr?'
+                    if shortIntent == "addMoreToShoppingList" and (item == "Nein" or item == "Fertig" or item == "Das wars"):
+                        # Done adding more items
+                        txt = "<say-as interpret-as="interjection">bazinga.</say-as>"
+                        question = None
+                        
                     else:
-                        question = '<say-as interpret-as="interjection">huch.</say-as>. Das hat nicht geklappt. Möchtest Du etwas anderes auf die Liste setzen?'
-                    print ("addToShoppingList - AddItemToList CALLED")
+                        if myMightyGrocery.addItemToList(item, list, quantity, unit):
+                            question = '<say-as interpret-as="interjection">alles klar.</say-as>. Noch mehr?'
+                        else:
+                            question = '<say-as interpret-as="interjection">huch.</say-as>. Das hat nicht geklappt. Möchtest Du etwas anderes auf die Liste setzen?'
+                        print ("addToShoppingList - AddItemToList CALLED")
                 else:
                     question = '<say-as interpret-as="interjection">huch.</say-as>. Da ist etwas schiefgegangen. Möchtest Du etwas anderes auf die Liste setzen?'
                     
                 # ask for more
-                required_slot_question["item"] = { "response": question, "intend": "addMoreToShoppingList"}
-                txt = None
+                if question:
+                    required_slot_question["item"] = { "response": question, "intend": "addMoreToShoppingList"}
+                    txt = None
             else:
                 # ask for list
                 required_slot_question["shop"] = { "response": "Welche Liste möchtest Du bearbeiten?", "intend": "askForShoppingList"}
