@@ -109,7 +109,7 @@ def on_message_intent(client, userdata, msg):
                     
                     
                 else:
-                    txt = "<say-as interpret-as="interjection">huch.</say-as>. Einkaufsliste %s ist leer" % groceryList
+                    txt = '<say-as interpret-as="interjection">huch.</say-as>. Einkaufsliste %s ist leer' % groceryList
             except:
                 txt = "Unbekannte Einkaufsliste"
     else:
