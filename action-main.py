@@ -162,14 +162,14 @@ def on_message_intent(client, userdata, msg):
 
                 question = ""
                 if item:
-                    if shortIntent == "addMoreToShoppingList" and (item == "Nein" or item == "Fertig" or item == "Das wars"  or item == "Das war alles"):
+                    if shortIntent == "addMoreToShoppingList" and (item == "Das war alles"):
                         # Done adding more items
                         txt = '<say-as interpret-as="interjection">bazinga.</say-as>'
                         question = None
                         
                     else:
                         if myMightyGrocery.addItemToList(item, list, quantity, unit):
-                            question = '<say-as interpret-as="interjection">alles klar.</say-as>. Noch mehr?'
+                            question = '<say-as interpret-as="interjection">alles klar.</say-as>, %s ist auf der Liste. Noch mehr?' % item
                         else:
                             question = '<say-as interpret-as="interjection">huch.</say-as>. Das hat nicht geklappt. Möchtest Du etwas anderes auf die Liste setzen?'
                         print ("addToShoppingList - AddItemToList CALLED")
