@@ -132,6 +132,8 @@ def on_message_intent(client, userdata, msg):
     elif shortIntent == "addToShoppingList" or shortIntent == "addMoreToShoppingList":
         print ("addToShoppingList - START")
         if intentMsg.custom_data and 'past_intent' in intentMsg.custom_data.keys():
+            if 'item' ind intentMsg.custom_data['slots'].keys():
+                del intentMsg.custom_data['slots']['item']
             intentMsg.slots.update (intentMsg.custom_data['slots'])
             print ("   Updated Slots: " + json.dumps(intentMsg.slots))
         if loginToMightyGrocery(intentMsg.config["secret"]["mightygrocery_email"], intentMsg.config["secret"]["mightygrocery_pw"]):
@@ -160,7 +162,7 @@ def on_message_intent(client, userdata, msg):
 
                 question = ""
                 if item:
-                    if shortIntent == "addMoreToShoppingList" and (item == "Nein" or item == "Fertig" or item == "Das wars"):
+                    if shortIntent == "addMoreToShoppingList" and (item == "Nein" or item == "Fertig" or item == "Das wars"  or item == "Das war alles"):
                         # Done adding more items
                         txt = '<say-as interpret-as="interjection">bazinga.</say-as>'
                         question = None
