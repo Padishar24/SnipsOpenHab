@@ -108,7 +108,7 @@ def on_message_intent(client, userdata, msg):
     elif shortIntent == "getShoppingList":                
         if loginToMightyGrocery(intentMsg.config["secret"]["mightygrocery_email"], intentMsg.config["secret"]["mightygrocery_pw"]):
             try:
-                groceryList = intentMsg.slots["list"]
+                groceryList = intentMsg.slots["shop"]
                 lists = myMightyGrocery.getShoppingLists ()
                 if groceryList not in lists:
                     raise Exception()
@@ -133,7 +133,7 @@ def on_message_intent(client, userdata, msg):
         if loginToMightyGrocery(intentMsg.config["secret"]["mightygrocery_email"], intentMsg.config["secret"]["mightygrocery_pw"]):
             list = None
             try:
-                list = intentMsg.slots["list"]
+                list = intentMsg.slots["shop"]
             except:
                 list = gMyCurrentShop
             if list:
@@ -163,10 +163,10 @@ def on_message_intent(client, userdata, msg):
                     question = '<say-as interpret-as="interjection">huch.</say-as>. Da ist etwas schiefgegangen. Möchtest Du etwas anderes auf die Liste setzen?'
                     
                 # ask for more
-                required_slot_question["list"] = { "response": question, "intend": "addMoreToShoppingList"}
+                required_slot_question["item"] = { "response": question, "intend": "addMoreToShoppingList"}
             else:
                 # ask for list
-                required_slot_question["list"] = { "response": "Welche Liste möchtest Du bearbeiten?", "intend": "askForShoppingList"}
+                required_slot_question["shop"] = { "response": "Welche Liste möchtest Du bearbeiten?", "intend": "askForShoppingList"}
     else:
         handledIntent = False
 
