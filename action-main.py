@@ -80,8 +80,11 @@ def on_message_intent(client, userdata, msg):
             if when and until:
                 print ("Getting appointments...")
                 calendar = Calendar(intentMsg.config)
-                txt = calendar.getAppointments (when, until)
-                print ("Appointments: " + txt)
+                (appointmentsInSpeak, errorMsg) = calendar.getAppointments (when, until)
+                if appointmentsInSpeak:
+                    txt = appointmentsInSpeak
+                else:
+                    txt = errorMsg
             else:
                 txt = "Zeitbereich unklar!"
         except:
