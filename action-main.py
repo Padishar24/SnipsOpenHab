@@ -169,12 +169,12 @@ def on_message_intent(client, userdata, msg):
                         
                     else:
                         if myMightyGrocery.addItemToList(item, list, quantity, unit):
-                            question = '<say-as interpret-as="interjection">alles klar.</say-as>, %s ist auf der Liste. Noch mehr?' % item
+                            question = '<say-as interpret-as="interjection">alles klar</say-as>, %s ist auf der Liste. Noch mehr?' % item
                         else:
-                            question = '<say-as interpret-as="interjection">huch.</say-as>. Das hat nicht geklappt. Möchtest Du etwas anderes auf die Liste setzen?'
+                            question = '<say-as interpret-as="interjection">huch</say-as>. Das hat nicht geklappt. Möchtest Du etwas anderes auf die Liste setzen?'
                         print ("addToShoppingList - AddItemToList CALLED")
                 else:
-                    question = '<say-as interpret-as="interjection">huch.</say-as>. Da ist etwas schiefgegangen. Möchtest Du etwas anderes auf die Liste setzen?'
+                    question = '<say-as interpret-as="interjection">huch</say-as>. Da ist etwas schiefgegangen. Möchtest Du etwas anderes auf die Liste setzen?'
                     
                 # ask for more
                 if question:
