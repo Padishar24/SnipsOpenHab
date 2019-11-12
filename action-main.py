@@ -191,19 +191,25 @@ def on_message_intent(client, userdata, msg):
     elif shortIntent == "stopMusic":
         gMusicControl.StopRadio()
         gMusicControl.StopSpotify()
+        txt = '<say-as interpret-as="interjection">alles klar</say-as>'
     elif shortIntent == "volume":
         gMusicControl.SetVolume (intentMsg.slots["volume"])
+        txt = '<say-as interpret-as="interjection">alles klar</say-as>'
     elif shortIntent == "playRadio":
         try:
             gMusicControl.PlayRadio(intentMsg.config["secret"]["radio_playlist"])
         except:
             gMusicControl.PlayRadio("radio")
+
+        txt = '<say-as interpret-as="interjection">alles klar</say-as>'
     elif shortIntent == "playPlaylist":
         print ("Open a playlist")
         try:
             (success, msg) = gMusicControl.PlayPlaylist(intentMsg.slots["playlist"])
             if not success:
                 txt = msg
+            else:
+                txt = '<say-as interpret-as="interjection">alles klar</say-as>'
         except:
             txt = "Entschuldigung, ich habe nicht verstanden, was ich abspielen soll."  
     elif shortIntent == "playArtist":
@@ -211,6 +217,8 @@ def on_message_intent(client, userdata, msg):
             (success, msg) = gMusicControl.PlayArtist(intentMsg.slots["artist"])
             if not success:
                 txt = msg
+            else:
+                txt = '<say-as interpret-as="interjection">alles klar</say-as>'
         except:
             txt = "Entschuldigung, ich habe nicht verstanden, was ich abspielen soll."  
 
