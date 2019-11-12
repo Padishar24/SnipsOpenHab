@@ -199,6 +199,7 @@ def on_message_intent(client, userdata, msg):
         except:
             gMusicControl.PlayRadio("radio")
     elif shortIntent == "playPlaylist":
+        print ("Open a playlist")
         try:
             (success, msg) = gMusicControl.PlayPlaylist(intentMsg.slots["playlist"])
             if not success:
