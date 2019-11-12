@@ -18,7 +18,7 @@ MQTT_BROKER_ADDRESS = "localhost:1883"
 MQTT_USERNAME = None
 MQTT_PASSWORD = None
 
-gMusicControl = MusicControl()
+gMusicControl = None
 myMightyGrocery = None
 gMyCurrentShop = None
 
@@ -46,6 +46,7 @@ def replaceUnitsWithAlias(unitStr):
 def on_message_intent(client, userdata, msg):
     global myMightyGrocery
     global gMyCurrentShop
+    global gMusicControl
         
     intentMsg = IntentMsg(msg)
 
@@ -274,6 +275,9 @@ if __name__ == "__main__":
         MQTT_USERNAME = snips_config['snips-common']['mqtt_username']
     if 'mqtt_password' in snips_config['snips-common'].keys():
         MQTT_PASSWORD = snips_config['snips-common']['mqtt_password']
+
+    global gMusicControl
+    gMusicControl = MusicControl()
 
     mqtt_client = mqtt.Client()
     mqtt_client.message_callback_add('hermes/intent/#', on_message_intent)
