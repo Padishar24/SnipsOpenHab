@@ -18,7 +18,7 @@ MQTT_BROKER_ADDRESS = "localhost:1883"
 MQTT_USERNAME = None
 MQTT_PASSWORD = None
 
-gMusicControl = None
+gMusicControl = MusicControl()
 myMightyGrocery = None
 gMyCurrentShop = None
 
@@ -189,20 +189,16 @@ def on_message_intent(client, userdata, msg):
                 txt = None
     
     elif shortIntent == "stopMusic":
-        global gMusicControl
         gMusicControl.StopRadio()
         gMusicControl.StopSpotify()
     elif shortIntent == "volume":
-        global gMusicControl
         gMusicControl.SetVolume (intentMsg.slots["volume"])
     elif shortIntent == "playRadio":
-        global gMusicControl
         try:
             gMusicControl.PlayRadio(intentMsg.config["secret"]["radio_playlist"])
         except:
             gMusicControl.PlayRadio("radio")
     elif shortIntent == "playPlaylist":
-        global gMusicControl
         try:
             (success, msg) = gMusicControl.PlayPlaylist(intentMsg.slots["playlist"])
             if not success:
@@ -210,7 +206,6 @@ def on_message_intent(client, userdata, msg):
         except:
             txt = "Entschuldigung, ich habe nicht verstanden, was ich abspielen soll."  
     elif shortIntent == "playArtist":
-        global gMusicControl
         try:
             (success, msg) = gMusicControl.PlayArtist(intentMsg.slots["artist"])
             if not success:
@@ -253,17 +248,18 @@ def dialogue(session_id, text, intent_filter, custom_data=None):
     mqtt_client.publish('hermes/dialogueManager/continueSession', json.dumps(data))
 
 def onDialogSessionStarted(client, userdata, msg):
-    print ("**** SESSION START DETECTED ****")
     global gMusicControl
+    print ("**** SESSION START DETECTED ****")
     gMusicControl.Pause()
         
 
 def onDialogSessionEnded(client, userdata, msg):
-    print ("**** SESSION END DETECTED ****")
     global gMusicControl
+    global myMightyGrocery
+    
+    print ("**** SESSION END DETECTED ****")
     gMusicControl.Resume() # Restarts playint
 
-    global myMightyGrocery
     myMightyGrocery = None # close web session
 
 
@@ -276,8 +272,6 @@ if __name__ == "__main__":
     if 'mqtt_password' in snips_config['snips-common'].keys():
         MQTT_PASSWORD = snips_config['snips-common']['mqtt_password']
 
-    global gMusicControl
-    gMusicControl = MusicControl()
 
     mqtt_client = mqtt.Client()
     mqtt_client.message_callback_add('hermes/intent/#', on_message_intent)
