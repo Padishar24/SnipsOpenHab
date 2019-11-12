@@ -250,7 +250,7 @@ def dialogue(session_id, text, intent_filter, custom_data=None):
 def onDialogSessionStarted(client, userdata, msg):
     global gMusicControl
     print ("**** SESSION START DETECTED ****")
-    #gMusicControl.Pause()
+    gMusicControl.Pause()
         
 
 def onDialogSessionEnded(client, userdata, msg):
@@ -258,7 +258,7 @@ def onDialogSessionEnded(client, userdata, msg):
     global myMightyGrocery
     
     print ("**** SESSION END DETECTED ****")
-    #gMusicControl.Resume() # Restarts playint
+    gMusicControl.Resume() # Restarts playint
 
     myMightyGrocery = None # close web session
 
