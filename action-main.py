@@ -6,18 +6,19 @@ import json
 import toml
 import KolfsInselAutomation
 from CalDavCalendar import Calendar
-from Tools import IntentMsg, getTimeRange, isRadioPlaying
+from Tools import IntentMsg, getTimeRange
 import datetime
 import subprocess
 from MyMightyGrocery import MyMightyGrocery 
 import sys, traceback
+from MusicControl import MusicControl
 
 USERNAME_INTENTS = "burkhardzeiner"
 MQTT_BROKER_ADDRESS = "localhost:1883"
 MQTT_USERNAME = None
 MQTT_PASSWORD = None
 
-gRadioIsPlaying = False
+gMusicControl = MusicControl()
 myMightyGrocery = None
 gMyCurrentShop = None
 
@@ -54,6 +55,7 @@ def on_message_intent(client, userdata, msg):
     print ("Short Intent: " + shortIntent)
     print ("   Slots: " + json.dumps(intentMsg.slots))
     handledIntent = True
+
     if shortIntent in ["LampenAnSchalten", "LampenAusSchalten", "LichtDimmen", "lightDimPercentage"]:
         if shortIntent == "lightDimPercentage":
             if intentMsg.custom_data and 'past_intent' in intentMsg.custom_data.keys():
@@ -184,12 +186,42 @@ def on_message_intent(client, userdata, msg):
                 # ask for list
                 required_slot_question["shop"] = { "response": "Welche Liste möchtest Du bearbeiten?", "intend": "askForShoppingList"}
                 txt = None
+    
+    elif shortIntent == "stopMusic":
+        global gMusicControl
+        gMusicControl.StopRadio()
+        gMusicControl.StopSpotify()
+    elif shortIntent == "volume":
+        global gMusicControl
+        gMusicControl.SetVolume (intentMsg.slots["volume"])
+    elif shortIntent == "playRadio":
+        global gMusicControl
+        try:
+            gMusicControl.PlayRadio(intentMsg.config["secret"]["radio_playlist"])
+        except:
+            gMusicControl.PlayRadio("radio")
+    elif shortIntent == "playPlaylist":
+        global gMusicControl
+        try:
+            (success, msg) = gMusicControl.PlayPlaylist(intentMsg.slots["playlist"])
+            if not success:
+                txt = msg
+        except:
+            txt = "Entschuldigung, ich habe nicht verstanden, was ich abspielen soll."  
+    elif shortIntent == "playArtist":
+        global gMusicControl
+        try:
+            (success, msg) = gMusicControl.PlayArtist(intentMsg.slots["artist"])
+            if not success:
+                txt = msg
+        except:
+            txt = "Entschuldigung, ich habe nicht verstanden, was ich abspielen soll."  
+
+    # elif shortIntent == "next":
+    #     global gMusicControl
+    #     subprocess.call("mpc next", shell=True)
     else:
         handledIntent = False
-
-    if shortIntent == "stop":
-        global gRadioIsPlaying
-        gRadioIsPlaying = False # update global state so that alarm is not turned on again after handling this intent
         
     if handledIntent:
         print ("Response: " + json.dumps(required_slot_question))
@@ -221,21 +253,14 @@ def dialogue(session_id, text, intent_filter, custom_data=None):
 
 def onDialogSessionStarted(client, userdata, msg):
     print ("**** SESSION START DETECTED ****")
-    global gRadioIsPlaying
-    if not gRadioIsPlaying:
-        gRadioIsPlaying = isRadioPlaying()
-        if gRadioIsPlaying:
-            subprocess.call("mpc stop", shell=True)
-            subprocess.call("mpc volume 100", shell=True)
+    global gMusicControl
+    gMusicControl.Pause()
         
 
 def onDialogSessionEnded(client, userdata, msg):
     print ("**** SESSION END DETECTED ****")
-    global gRadioIsPlaying
-    if gRadioIsPlaying:
-        gRadioIsPlaying = False
-        subprocess.call("mpc play", shell=True)
-        subprocess.call("mpc volume 85", shell=True)
+    global gMusicControl
+    gMusicControl.Resume() # Restarts playint
 
     global myMightyGrocery
     myMightyGrocery = None # close web session
