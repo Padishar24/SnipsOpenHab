@@ -14,7 +14,7 @@ import json
 import os
 import sys
 import time
-
+import traceback
 import requests
 
 # Workaround to support both python 2 & 3
@@ -149,7 +149,7 @@ class SpotifyOAuth(object):
                     token_info = self.refresh_access_token(token_info['refresh_token'])
 
             except:
-                print ("Exception: " + sys.exc_info()[0])
+                print (traceback.format_exc())
                 self._warn("couldn't read token cache from " + self.cache_path)
                 pass
         return token_info
@@ -161,7 +161,7 @@ class SpotifyOAuth(object):
                 f.write(json.dumps(token_info))
                 f.close()
             except:
-                print ("Exception: " + sys.exc_info()[0])
+                print (traceback.format_exc())
                 self._warn("couldn't write token cache to " + self.cache_path)
                 pass
 
