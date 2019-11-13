@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 
 from __future__ import print_function
-import sys, traceback
 
 __all__ = [
     'is_token_expired',
@@ -149,7 +148,9 @@ class SpotifyOAuth(object):
                 if self.is_token_expired(token_info):
                     token_info = self.refresh_access_token(token_info['refresh_token'])
 
-            except IOError:
+            except:
+                print ("Exception: " + sys.exc_info()[0])
+                self._warn("couldn't read token cache from " + self.cache_path)
                 pass
         return token_info
 
@@ -159,7 +160,7 @@ class SpotifyOAuth(object):
                 f = open(self.cache_path, 'w')
                 f.write(json.dumps(token_info))
                 f.close()
-            except IOError:
+            except:
                 print ("Exception: " + sys.exc_info()[0])
                 self._warn("couldn't write token cache to " + self.cache_path)
                 pass
