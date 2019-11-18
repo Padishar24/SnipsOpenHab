@@ -106,3 +106,4 @@ venv.bak/
 # spotify cache
 .cache*
 .cache-burkhardzeiner+spotify@googlemail.com
+/config.ini

@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 
 from __future__ import print_function
+import configparser
 
 __all__ = [
     'is_token_expired',
@@ -16,6 +17,7 @@ import sys
 import time
 import traceback
 import requests
+import io
 
 # Workaround to support both python 2 & 3
 import six
@@ -136,9 +138,17 @@ class SpotifyOAuth(object):
         token_info = None
         if self.cache_path:
             try:
-                f = open(self.cache_path)
-                token_info_string = f.read()
-                f.close()
+                token_info_string = ""
+                if self.cache_path.find (".ini") != -1:
+                    # read from config file - hack for snips enviroment
+                    with io.open(self.cache_path, encoding="utf-8") as f:
+                        conf_parser = configparser.ConfigParser()
+                        conf_parser.readfp(f)
+                        token_info_string = conf_parser['secret']['spotifyToken']                    
+                else:
+                    f = open(self.cache_path)
+                    token_info_string = f.read()
+                    f.close()
                 token_info = json.loads(token_info_string)
 
                 # if scopes don't match, then bail
@@ -157,9 +167,24 @@ class SpotifyOAuth(object):
     def _save_token_info(self, token_info):
         if self.cache_path:
             try:
-                f = open(self.cache_path, 'w')
-                f.write(json.dumps(token_info))
-                f.close()
+                if self.cache_path.find (".ini") != -1:
+                    # read from config file - hack for snips enviroment
+                    conf_parser = configparser.ConfigParser()
+                    try:
+                        with io.open(self.cache_path, encoding="utf-8") as f:                            
+                            conf_parser.readfp(f)
+                    except:
+                        pass
+                    if conf_parser:
+                        if "secret" not in conf_parser.sections():
+                            conf_parser.add_section("secret")
+                        conf_parser['secret']['spotifyToken'] = json.dumps(token_info)
+                        with io.open(self.cache_path, "w", encoding="utf-8") as f:
+                            conf_parser.write(f)
+                else:
+                    f = open(self.cache_path, 'w')
+                    f.write(json.dumps(token_info))
+                    f.close()
             except:
                 print (traceback.format_exc())
                 self._warn("couldn't write token cache to " + self.cache_path)
