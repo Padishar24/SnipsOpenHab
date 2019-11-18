@@ -53,13 +53,13 @@ def WelcheTermineHabeIchInDerNaechstenStunde():
 
 def UnitTest_Calendar():
     tests = [
-        "WelcheTermineHabeIchMorgen", 
+        # "WelcheTermineHabeIchMorgen", 
         # "WelcheTermineHabeIchInDieserWoche",
         # "WelcheTermineHabeIchDiesenMonat",
         # "WelcheTermineHabeIchInDiesemViertelJahr",
         # "WelcheTermineHabeIchJetzt",
         # "WelcheTerminHabeIchIndenNaechstenZweiWochen",
-        # "WelcheTermineHabeIchÜbermorgen",
+        "WelcheTermineHabeIchÜbermorgen",
         # "WelcheTermineHabeIchInDerNaechstenStunde"
     ]
     

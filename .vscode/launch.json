@@ -12,6 +12,13 @@
             "console": "integratedTerminal"
         },
         {
+            "name": "Unit Tests (Python)",
+            "type": "python",
+            "request": "launch",
+            "program": "E:\\documents\\_Projekte\\SnipsOpenhab\\unittests.py",
+            "console": "integratedTerminal"
+        },
+        {
             "name": "Python: Aktuelle Datei",
             "type": "python",
             "request": "launch",

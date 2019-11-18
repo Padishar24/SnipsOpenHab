@@ -9,7 +9,7 @@
         "rawValue": "übermorgen",
         "value": {
           "kind": "InstantTime",
-          "value": "2019-11-04 00:00:00 +00:00",
+          "value": "2019-11-18 00:00:00 +00:00",
           "grain": "Day",
           "precision": "Exact"
         },
