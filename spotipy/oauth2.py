@@ -144,7 +144,8 @@ class SpotifyOAuth(object):
                     with io.open(self.cache_path, encoding="utf-8") as f:
                         conf_parser = configparser.ConfigParser()
                         conf_parser.readfp(f)
-                        token_info_string = conf_parser['secret']['spotifyToken']                    
+                        token_info_string = conf_parser['secret']['spotifyToken']       
+                        print ("Read spotify token from %s" % self.cache_path)             
                 else:
                     f = open(self.cache_path)
                     token_info_string = f.read()
@@ -181,6 +182,7 @@ class SpotifyOAuth(object):
                         conf_parser['secret']['spotifyToken'] = json.dumps(token_info)
                         with io.open(self.cache_path, "w", encoding="utf-8") as f:
                             conf_parser.write(f)
+                            print ("Saved spotify token to %s" % self.cache_path)
                 else:
                     f = open(self.cache_path, 'w')
                     f.write(json.dumps(token_info))
