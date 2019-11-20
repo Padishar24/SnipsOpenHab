@@ -9,7 +9,7 @@
         "rawValue": "morgen",
         "value": {
           "kind": "InstantTime",
-          "value": "2019-11-04 00:00:00 +00:00",
+          "value": "2019-11-20 00:00:00 +00:00",
           "grain": "Day",
           "precision": "Exact"
         },

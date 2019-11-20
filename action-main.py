@@ -89,6 +89,11 @@ def on_message_intent(client, userdata, msg):
             elif errorMsg:
                 txt = "<s>" + txt + ("</s><p>%s</p>" % errorMsg)
 
+            (tasksInSpeak, errorMsg) = calendar.getTasks (tomorrow)
+
+            if tasksInSpeak:
+                txt = txt + "<p>Folgende Aufgaben stehen heute an:</p>" + tasksInSpeak
+            
     elif shortIntent == "getAppointments":
         try:
             (when, until) = getTimeRange(intentMsg.slots["date"])
@@ -98,6 +103,30 @@ def on_message_intent(client, userdata, msg):
                 (appointmentsInSpeak, errorMsg) = calendar.getAppointments (when, until)
                 if appointmentsInSpeak:
                     txt = appointmentsInSpeak
+                else:
+                    txt = errorMsg
+            else:
+                txt = "Zeitbereich unklar!"
+        except:
+            print ('-'*60)
+            print ("Exception: " + sys.exc_info()[0])
+            traceback.print_exc(file=sys.stdout)
+            print ('-'*60)
+            txt = "Fehler!"
+    elif shortIntent == "getTasks":
+        try:
+            (when, until) = getTimeRange(intentMsg.slots["date"])
+            whom = None
+            try:
+                whom = intentMsg.slots["whom"]
+            except:
+                pass
+            if when and until:
+                print ("Getting tasks...")
+                calendar = Calendar(intentMsg.config)
+                (tasksInSpeak, errorMsg) = calendar.getTasks (until, whom=whom, startDate=when)
+                if tasksInSpeak:
+                    txt = tasksInSpeak
                 else:
                     txt = errorMsg
             else:
