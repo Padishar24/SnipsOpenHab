@@ -161,6 +161,8 @@ def on_message_intent(client, userdata, msg):
                 txt = "Unbekannte Einkaufsliste"
         else:
             txt = "Verbindung zur Einkaufsliste fehlgeschlagen."
+    elif shortIntent == "abortShopping":
+        txt = "Okay, viel Spaß beim Einkaufen."
     elif shortIntent == "addToShoppingList" or shortIntent == "addMoreToShoppingList":
         print ("addToShoppingList - START")
         if intentMsg.custom_data and 'past_intent' in intentMsg.custom_data.keys():
@@ -210,7 +212,7 @@ def on_message_intent(client, userdata, msg):
                     
                 # ask for more
                 if question:
-                    required_slot_question["item"] = { "response": question, "intend": "addMoreToShoppingList"}
+                    required_slot_question["item"] = { "response": question, "intend": ["addMoreToShoppingList", "abortShopping"]}
                     txt = None
             else:
                 # ask for list
@@ -263,8 +265,14 @@ def on_message_intent(client, userdata, msg):
             slot = next(iter(required_slot_question))
             response = required_slot_question[slot]["response"]
             intend = required_slot_question[slot]["intend"]
+            intents = []
+            if type(intend) == list:
+                for i in intend:
+                    intents.append (add_prefix(i))
+            else:
+                intents = [add_prefix(intend)]
             custom_data = {'past_intent': intentMsg.intent_id, 'siteId': intentMsg.site_id, 'slots': intentMsg.slots}
-            dialogue(intentMsg.session_id, response, [add_prefix(intend)], custom_data=custom_data)
+            dialogue(intentMsg.session_id, response, intents, custom_data=custom_data)
         else:
             say(intentMsg.session_id, txt)   
   
