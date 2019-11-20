@@ -133,8 +133,7 @@ def on_message_intent(client, userdata, msg):
                 txt = "Zeitbereich unklar!"
         except:
             print ('-'*60)
-            print ("Exception: " + sys.exc_info()[0])
-            traceback.print_exc(file=sys.stdout)
+            print (traceback.format_exc())
             print ('-'*60)
             txt = "Fehler!"
     elif shortIntent == "getShoppingList":                
