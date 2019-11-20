@@ -266,7 +266,7 @@ def on_message_intent(client, userdata, msg):
             response = required_slot_question[slot]["response"]
             intend = required_slot_question[slot]["intend"]
             intents = []
-            if type(intend) == list:
+            if type(intend) is not str:
                 for i in intend:
                     intents.append (add_prefix(i))
             else:
