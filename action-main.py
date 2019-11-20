@@ -270,7 +270,7 @@ def on_message_intent(client, userdata, msg):
                 for i in intend:
                     intents.append (add_prefix(i))
             else:
-                intents = [add_prefix(intend)]
+                intents.append (add_prefix(intend))
             custom_data = {'past_intent': intentMsg.intent_id, 'siteId': intentMsg.site_id, 'slots': intentMsg.slots}
             dialogue(intentMsg.session_id, response, intents, custom_data=custom_data)
         else:
