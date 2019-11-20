@@ -89,10 +89,10 @@ def on_message_intent(client, userdata, msg):
             elif errorMsg:
                 txt = "<s>" + txt + ("</s><p>%s</p>" % errorMsg)
 
-            (tasksInSpeak, errorMsg) = calendar.getTasks (tomorrow)
+            # (tasksInSpeak, errorMsg) = calendar.getTasks (tomorrow)
 
-            if tasksInSpeak:
-                txt = txt + "<p>Folgende Aufgaben stehen heute an:</p>" + tasksInSpeak
+            # if tasksInSpeak:
+            #     txt = txt + "<p>Folgende Aufgaben stehen heute an:</p>" + tasksInSpeak
             
     elif shortIntent == "getAppointments":
         try:
