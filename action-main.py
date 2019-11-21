@@ -307,8 +307,12 @@ def onDialogSessionEnded(client, userdata, msg):
 
     myMightyGrocery = None # close web session
 
+def onInjectionComplete(client, userdata, msg):
+    print ("*** INJECTION DONE ***")
+
 
 if __name__ == "__main__":
+    global gMusicControl
     snips_config = toml.load('/etc/snips.toml')
     if 'mqtt' in snips_config['snips-common'].keys():
         MQTT_BROKER_ADDRESS = snips_config['snips-common']['mqtt']
@@ -322,10 +326,20 @@ if __name__ == "__main__":
     mqtt_client.message_callback_add('hermes/intent/#', on_message_intent)
     mqtt_client.message_callback_add ('hermes/hotword/toggleOff', onDialogSessionStarted)
     mqtt_client.message_callback_add ('hermes/hotword/toggleOn', onDialogSessionEnded)
+    mqtt_client.message_callback_add ('hermes/injection/complete', onInjectionComplete)
     mqtt_client.username_pw_set(MQTT_USERNAME, MQTT_PASSWORD)
     mqtt_client.connect(MQTT_BROKER_ADDRESS.split(":")[0], int(MQTT_BROKER_ADDRESS.split(":")[1]))
     mqtt_client.subscribe('hermes/intent/#')
     mqtt_client.subscribe ('hermes/hotword/toggleOff')
     mqtt_client.subscribe ('hermes/hotword/toggleOn')
+    mqtt_client.subscribe ('hermes/injection/complete')
     kia = KolfsInselAutomation.KolfsInselAutomation()
+
+    (res, playlists) = gMusicControl.GetPlaylists()
+    if res and len (playlists) > 0:
+        print ("*** INJECT PLAYLISTS *** ")
+        payload = {"operations": ["addFromVanilla":{"spotifyPlaylist" : playlists}]}
+        print (payload)
+        mqtt_client.publish('hermes/injection/perform', json.dumps(payload))
+
     mqtt_client.loop_forever()
