@@ -338,7 +338,7 @@ if __name__ == "__main__":
     (res, playlists) = gMusicControl.GetPlaylists()
     if res and len (playlists) > 0:
         print ("*** INJECT PLAYLISTS *** ")
-        payload = {"operations": [["addFromVanilla", {"spotifyPlaylist" : [x.encode('utf-8') for x in playlists]}]]}
+        payload = {"operations": [["addFromVanilla", {"spotifyPlaylist" : [str(x.encode('utf-8')) for x in playlists]}]]}
         print (payload)
         print (json.dumps(payload))
         mqtt_client.publish('hermes/injection/perform', json.dumps(payload))
