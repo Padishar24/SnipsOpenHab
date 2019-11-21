@@ -312,7 +312,7 @@ def onInjectionComplete(client, userdata, msg):
 
 
 if __name__ == "__main__":
-    global gMusicControl
+
     snips_config = toml.load('/etc/snips.toml')
     if 'mqtt' in snips_config['snips-common'].keys():
         MQTT_BROKER_ADDRESS = snips_config['snips-common']['mqtt']
