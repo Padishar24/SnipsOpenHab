@@ -201,11 +201,14 @@ def on_message_intent(client, userdata, msg):
                         question = None
                         
                     else:
-                        if myMightyGrocery.addItemToList(item, list, quantity, unit):
-                            question = '<say-as interpret-as="interjection">alles klar</say-as>, %s ist auf der Liste. Noch mehr?' % item
-                        else:
-                            question = '<say-as interpret-as="interjection">huch</say-as>. Das hat nicht geklappt. Möchtest Du etwas anderes auf die Liste setzen?'
-                        print ("addToShoppingList - AddItemToList CALLED")
+                        # if myMightyGrocery.addItemToList(item, list, quantity, unit):
+                        #     question = '<say-as interpret-as="interjection">alles klar</say-as>, %s ist auf der Liste. Noch mehr?' % item
+                        # else:
+                        #     question = '<say-as interpret-as="interjection">huch</say-as>. Das hat nicht geklappt. Möchtest Du etwas anderes auf die Liste setzen?'
+                        # print ("addToShoppingList - AddItemToList CALLED")
+                        threading.Timer(1, myMightyGrocery.addItemToList, [item, list, quantity, unit]).start()
+                        print ("addToShoppingList - AddItemToList STARTED")
+                        question = '<say-as interpret-as="interjection">alles klar</say-as>, %s ist auf der Liste. Noch mehr?' % item
                 else:
                     question = '<say-as interpret-as="interjection">huch</say-as>. Da ist etwas schiefgegangen. Möchtest Du etwas anderes auf die Liste setzen?'
                     
@@ -339,7 +342,7 @@ if __name__ == "__main__":
     if res and len (playlists) > 0:
         print ("*** INJECT PLAYLISTS *** ")
         payload = {"operations": [["addFromVanilla", {"spotifyPlaylist" : playlists}]]}
-        print (payload)
+        #print (payload)
         print (json.dumps(payload))
         mqtt_client.publish('hermes/injection/perform', json.dumps(payload))
 
