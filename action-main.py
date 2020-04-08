@@ -298,7 +298,7 @@ def dialogue(session_id, text, intent_filter, custom_data=None):
 def onDialogSessionStarted(client, userdata, msg):
     global gMusicControl
     print ("**** SESSION START DETECTED ****")
-    gMusicControl.Pause()
+    #gMusicControl.Pause()
         
 
 def onDialogSessionEnded(client, userdata, msg):
@@ -306,7 +306,7 @@ def onDialogSessionEnded(client, userdata, msg):
     global myMightyGrocery
     
     print ("**** SESSION END DETECTED ****")
-    gMusicControl.Resume() # Restarts playint
+    #gMusicControl.Resume() # Restarts playint
 
     myMightyGrocery = None # close web session
 
@@ -339,11 +339,17 @@ if __name__ == "__main__":
     kia = KolfsInselAutomation.KolfsInselAutomation()
 
     (res, playlists) = gMusicControl.GetPlaylists()
+    dicToAdd = {}
     if res and len (playlists) > 0:
-        print ("*** INJECT PLAYLISTS *** ")
-        payload = {"operations": [["addFromVanilla", {"spotifyPlaylist" : playlists}]]}
-        #print (payload)
-        print (json.dumps(payload))
-        mqtt_client.publish('hermes/injection/perform', json.dumps(payload))
+        dicToAdd["spotifyPlaylist"] = playlists
+        
+    # add light devices
+    dicToAdd["device"] = ["Sonnenschutz"]
+
+    print ("*** INJECT PLAYLISTS AND DEVICES *** ")
+    payload = {"operations": [["addFromVanilla", dicToAdd]]}
+    #print (payload)
+    print (json.dumps(payload))
+    mqtt_client.publish('hermes/injection/perform', json.dumps(payload))
 
     mqtt_client.loop_forever()
