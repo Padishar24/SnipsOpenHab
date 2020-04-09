@@ -345,6 +345,7 @@ if __name__ == "__main__":
         
     # add light devices
     dicToAdd["lightDevice"] = ["Sonnenschutz"]
+    dicToAdd["lightDevice"] = ["Fernsehlicht"]
 
     print ("*** INJECT PLAYLISTS AND DEVICES *** ")
     payload = {"operations": [["addFromVanilla", dicToAdd]]}
