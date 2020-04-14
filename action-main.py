@@ -344,7 +344,7 @@ if __name__ == "__main__":
         dicToAdd["spotifyPlaylist"] = playlists
         
     # add light devices
-    dicToAdd["lightDevice"] = ["Sonnenschutz"]
+    dicToAdd["lightDevice"] = ["Dunkellicht"]
     dicToAdd["lightDevice"] = ["Fernsehlicht"]
 
     print ("*** INJECT PLAYLISTS AND DEVICES *** ")
